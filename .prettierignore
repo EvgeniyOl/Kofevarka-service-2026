@@ -1,0 +1,10 @@
+# Артефакты сборки и зависимости
+dist
+node_modules
+
+# Файлы, которые форматирует не Prettier, а менеджер пакетов
+package-lock.json
+*.tsbuildinfo
+
+# Кэш Vite
+.vite

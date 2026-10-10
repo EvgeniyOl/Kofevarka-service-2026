@@ -1,0 +1,14 @@
+# Нормализация переводов строк.
+# В рабочей копии всегда LF: Prettier настроен на endOfLine: "lf", а git на Windows
+# по умолчанию (core.autocrlf=true) перезаписывает файлы в CRLF — после чего
+# prettier --check начинает падать на каждом файле.
+* text=auto eol=lf
+
+# Бинарные файлы не трогаем
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
