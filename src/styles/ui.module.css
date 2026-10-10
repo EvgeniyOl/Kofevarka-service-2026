@@ -1,0 +1,154 @@
+/*
+ * Общие UI-примитивы. Это тоже CSS Module (классы хешируются), просто один
+ * на весь проект — чтобы кнопки, карточки и сетки не расползались по стилям.
+ */
+.container {
+  width: min(1200px, 100% - 40px);
+  margin-inline: auto;
+}
+
+.section {
+  padding: 96px 0;
+}
+
+.sectionTight {
+  padding: 56px 0;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 26px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3.4vw, 2.7rem);
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 62ch;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #1b1208;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--ease),
+    box-shadow 0.25s var(--ease),
+    filter 0.25s var(--ease);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(224, 164, 94, 0.28);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btnGhost {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--cream);
+}
+
+.btnGhost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(245, 236, 225, 0.04);
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(245, 236, 225, 0.05), rgba(245, 236, 225, 0.015));
+}
+
+.grid {
+  display: grid;
+  gap: 22px;
+}
+
+.input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(19, 16, 13, 0.6);
+  color: var(--cream);
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+
+.input::placeholder {
+  color: rgba(169, 152, 132, 0.7);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.fieldError {
+  color: var(--berry);
+  font-size: 0.82rem;
+}
+
+.price {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--cream);
+}

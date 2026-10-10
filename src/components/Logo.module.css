@@ -1,0 +1,110 @@
+.logo {
+  display: block;
+  overflow: visible;
+  transition:
+    transform 0.55s var(--ease),
+    filter 0.55s var(--ease);
+}
+
+.logo:hover {
+  transform: scale(1.06) rotate(8deg);
+  filter: drop-shadow(0 10px 22px rgba(224, 164, 94, 0.3));
+}
+
+/* Весь знак: появление с лёгким доворотом */
+.badge {
+  transform-box: view-box;
+  transform-origin: 100px 100px;
+  animation: badgeIn 0.9s var(--ease) both;
+}
+
+/* Обод обводится по кругу */
+.rim {
+  stroke-dasharray: 620;
+  stroke-dashoffset: 620;
+  animation: rimDraw 1.4s var(--ease) 0.15s forwards;
+}
+
+/* Блик, обегающий обод */
+.sheen {
+  transform-box: view-box;
+  transform-origin: 100px 100px;
+  animation: sheenSpin 7s linear infinite;
+}
+
+.text {
+  font-family: Montserrat, Futura, 'Century Gothic', system-ui, sans-serif;
+  font-weight: 600;
+  fill: var(--cream);
+}
+
+/* Звёзды мерцают по очереди */
+.star {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: twinkle 3.6s ease-in-out infinite;
+}
+
+.starLate {
+  animation-delay: 1.8s;
+}
+
+/* Белая плашка появляется чуть позже знака */
+.plate {
+  transform-box: view-box;
+  transform-origin: 100px 100px;
+  animation: plateIn 0.75s var(--ease) 0.2s both;
+}
+
+@keyframes badgeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.84) rotate(-10deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes plateIn {
+  from {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+
+  60% {
+    transform: scale(1.04);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rimDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes sheenSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}

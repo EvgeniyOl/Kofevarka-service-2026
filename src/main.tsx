@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App'
+import { AppRouter } from './app/router'
 import { StoreProvider } from './stores/StoreProvider'
 import './index.css'
 
@@ -13,7 +13,7 @@ if (!container) {
 createRoot(container).render(
   <StrictMode>
     <StoreProvider>
-      <App />
+      <AppRouter />
     </StoreProvider>
   </StrictMode>,
 )

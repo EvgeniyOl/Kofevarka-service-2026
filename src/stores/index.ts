@@ -1,14 +1,32 @@
-import { CoffeeStore } from './CoffeeStore'
+import { AboutStore } from './AboutStore'
+import { CartStore } from './CartStore'
+import { CatalogStore } from './CatalogStore'
+import { ContactsStore } from './ContactsStore'
+import { DeliveryStore } from './DeliveryStore'
+import { HomeStore } from './HomeStore'
+import { SubscriptionStore } from './SubscriptionStore'
 
 /**
- * Корневой стор приложения.
- * Когда появятся другие разделы — просто добавьте их сюда.
+ * Корневой стор приложения: у каждого раздела свой стор,
+ * а корзина — общая, её читает и шапка, и страница заказа.
  */
 export class RootStore {
-  readonly coffee: CoffeeStore
+  readonly cart: CartStore
+  readonly home: HomeStore
+  readonly catalog: CatalogStore
+  readonly subscription: SubscriptionStore
+  readonly about: AboutStore
+  readonly delivery: DeliveryStore
+  readonly contacts: ContactsStore
 
   constructor() {
-    this.coffee = new CoffeeStore()
+    this.cart = new CartStore()
+    this.home = new HomeStore(this.cart)
+    this.catalog = new CatalogStore(this.cart)
+    this.subscription = new SubscriptionStore(this.cart)
+    this.about = new AboutStore()
+    this.delivery = new DeliveryStore()
+    this.contacts = new ContactsStore()
   }
 }
 

@@ -1,0 +1,146 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition:
+    transform 0.45s var(--ease),
+    border-color 0.45s var(--ease),
+    box-shadow 0.45s var(--ease);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow);
+}
+
+.added {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.art {
+  position: relative;
+  padding: 10px 10px 0;
+}
+
+.badge,
+.decaf {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(19, 16, 13, 0.72);
+  backdrop-filter: blur(6px);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.decaf {
+  top: auto;
+  bottom: 20px;
+  left: 20px;
+  color: var(--cream);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.origin {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.roast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+}
+
+.roastLabel {
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.roastScale {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.roastDot {
+  width: 16px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(245, 236, 225, 0.14);
+}
+
+.roastOn {
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+}
+
+.roastText {
+  color: var(--muted);
+}
+
+.notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.text {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.prices {
+  display: flex;
+  flex-direction: column;
+}
+
+.per100 {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.add {
+  padding: 12px 20px;
+  font-size: 0.92rem;
+}
+
+.addDone {
+  background: linear-gradient(135deg, var(--ok), #5f8a4c);
+  color: #10190c;
+  animation: popIn 0.35s var(--ease);
+}

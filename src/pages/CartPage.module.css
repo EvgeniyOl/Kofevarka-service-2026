@@ -1,0 +1,247 @@
+.page {
+  padding: 64px 0 40px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 56px 32px;
+  text-align: center;
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 18px;
+  animation: riseIn 0.4s var(--ease);
+}
+
+.lineArt {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.lineBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lineName {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.lineMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lineActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.remove {
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.25s var(--ease);
+}
+
+.remove:hover {
+  color: var(--berry);
+}
+
+.lineTotal {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.side {
+  position: sticky;
+  top: calc(var(--header-h) + 20px);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 26px;
+}
+
+.summaryTitle {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.rows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rows dt {
+  color: var(--muted);
+}
+
+.rows dd {
+  margin: 0;
+}
+
+.discountRow dd {
+  color: var(--ok);
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressHead {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.progressTrack {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.progressBar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  transition: width 0.5s var(--ease);
+}
+
+.total {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.totalLabel {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.totalValue {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  color: var(--accent);
+}
+
+.promo {
+  display: flex;
+  gap: 8px;
+}
+
+.promo button {
+  white-space: nowrap;
+  padding: 12px 18px;
+  font-size: 0.88rem;
+}
+
+.promoOk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--ok);
+}
+
+.note {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.clear {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.clear:hover {
+  color: var(--berry);
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .side {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .line {
+    grid-template-columns: 90px 1fr;
+  }
+
+  .lineTotal {
+    grid-column: 2;
+    text-align: left;
+  }
+}

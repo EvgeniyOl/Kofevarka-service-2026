@@ -1,0 +1,21 @@
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 40px;
+  max-width: 70ch;
+}
+
+.center {
+  align-items: center;
+  text-align: center;
+  margin-inline: auto;
+}
+
+.title {
+  max-width: 24ch;
+}
+
+.center .title {
+  max-width: 30ch;
+}

@@ -1,0 +1,189 @@
+.page {
+  padding: 64px 0 40px;
+}
+
+.channels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+  margin-bottom: 40px;
+}
+
+.channel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 24px;
+  transition:
+    transform 0.35s var(--ease),
+    border-color 0.35s var(--ease);
+}
+
+.channel:hover {
+  transform: translateY(-6px);
+  border-color: var(--line-strong);
+}
+
+.channelIcon {
+  font-size: 1.5rem;
+}
+
+.channelTitle {
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.channelValue {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--cream);
+  transition: color 0.25s var(--ease);
+}
+
+a.channelValue:hover {
+  color: var(--accent);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.formCard {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+}
+
+.blockTitle {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.success {
+  padding: 14px 18px;
+  border: 1px solid rgba(127, 168, 106, 0.4);
+  border-radius: var(--radius-sm);
+  background: rgba(127, 168, 106, 0.12);
+  color: var(--ok);
+  font-size: 0.92rem;
+  animation: riseIn 0.4s var(--ease);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Декоративная «карта»: рисуем сеткой, чтобы не тянуть картографический виджет */
+.map {
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  min-height: 240px;
+  padding: 24px;
+  background-image:
+    linear-gradient(rgba(245, 236, 225, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 236, 225, 0.07) 1px, transparent 1px),
+    radial-gradient(400px 200px at 60% 30%, rgba(224, 164, 94, 0.16), transparent 70%);
+  background-size:
+    34px 34px,
+    34px 34px,
+    auto;
+}
+
+.mapPin {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 14px 34px rgba(224, 164, 94, 0.35);
+  font-size: 1.4rem;
+  line-height: 1;
+  animation: floatY 5s ease-in-out infinite;
+}
+
+.mapLabel {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.hours {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+}
+
+.hours ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.92rem;
+}
+
+.hours li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.hours li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
