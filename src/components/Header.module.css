@@ -103,9 +103,19 @@
 }
 
 .phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 18px;
   font-size: 0.9rem;
   white-space: nowrap;
+}
+
+/* Трубка нужна только там, где номер не помещается */
+.phoneIcon {
+  display: none;
+  width: 20px;
+  height: 20px;
 }
 
 .burger {
@@ -178,11 +188,88 @@
   .burger {
     display: flex;
   }
+}
 
-  /* На узком экране шапка не должна занимать пол-экрана,
-     но знак остаётся заметно крупнее прежних 44 px */
-  .logo svg {
-    width: 76px;
-    height: 76px;
+/*
+ * Телефон: в шапке четыре элемента (знак, название, телефон, меню), и на узком
+ * экране они налезали друг на друга. Поэтому уменьшаем знак, а от 620 px
+ * оставляем вместо номера иконку трубки — связаться всё равно можно в один тап.
+ */
+@media (max-width: 960px) {
+  .bar {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 620px) {
+  /*
+   * На телефоне шапка липкая: при прокрутке сквозь неё был виден текст
+   * страницы и налезал на знак. Плотный фон убирает это — на широком экране
+   * прозрачность оставляем, там шапка не мешает.
+   */
+  .header {
+    background: var(--bg);
+  }
+
+  .scrolled {
+    background: var(--bg);
+    border-bottom-color: var(--line);
+  }
+
+  .bar {
+    gap: 10px;
+    min-height: 72px;
+  }
+
+  /* Знак меньше: в шапке должны ужиться название, телефон и меню */
+  .logo img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .logo {
+    gap: 8px;
+  }
+
+  .logoText {
+    font-size: 1.05rem;
+  }
+
+  .logoText em {
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+  }
+
+  .phone {
+    padding: 9px 12px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 400px) {
+  /*
+   * Узкий экран: номер не влезает, оставляем круглую кнопку с трубкой —
+   * звонок по-прежнему в один тап, подпись для скринридеров на месте.
+   */
+  .phone {
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+  }
+
+  .phoneText {
+    display: none;
+  }
+
+  .phoneIcon {
+    display: block;
+  }
+}
+
+@media (max-width: 340px) {
+  /* Совсем узкий экран: названию рядом со знаком уже не место */
+  .logoText {
+    display: none;
   }
 }

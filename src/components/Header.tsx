@@ -54,8 +54,30 @@ export function Header() {
         </nav>
 
         <div className={styles.actions}>
-          <a className={cx(ui.btn, ui.btnGhost, styles.phone)} href={`tel:${CONTACT_PHONE_HREF}`}>
-            {CONTACT_PHONE}
+          {/*
+            На узком экране номер не помещается, поэтому от него остаётся
+            иконка трубки — сама ссылка та же, звонок в один тап. Иконка
+            нарисована линией: текстовый символ «✆» система рисует
+            цветным эмодзи, и в шапке это выглядело мусором.
+          */}
+          <a
+            className={cx(ui.btn, ui.btnGhost, styles.phone)}
+            href={`tel:${CONTACT_PHONE_HREF}`}
+            aria-label={`Позвонить: ${CONTACT_PHONE}`}
+          >
+            <span className={styles.phoneText}>{CONTACT_PHONE}</span>
+            <svg
+              className={styles.phoneIcon}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6.5 3.5h3l1.5 4-2 1.4a12 12 0 0 0 6.1 6.1l1.4-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z" />
+            </svg>
           </a>
 
           <button
