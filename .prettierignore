@@ -6,5 +6,8 @@ node_modules
 package-lock.json
 *.tsbuildinfo
 
+# Образец переменных окружения: у Prettier нет парсера для такого формата
+.env.example
+
 # Кэш Vite
 .vite
