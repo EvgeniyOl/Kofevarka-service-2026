@@ -6,6 +6,7 @@ import { ProductCard } from '../components/ProductCard'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
 import { StatValue } from '../components/StatValue'
+import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '../data/contacts'
 import { formatPrice, priceFor } from '../data/products'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
@@ -35,12 +36,12 @@ export const HomePage = observer(function HomePage() {
             <p className={cx(ui.lead, styles.heroLead)}>{home.heroLead}</p>
 
             <div className={styles.heroActions}>
-              <Link className={ui.btn} to={ROUTES.catalog.path}>
-                Смотреть витрину
-              </Link>
-              <Link className={cx(ui.btn, ui.btnGhost)} to={ROUTES.contacts.path}>
+              <Link className={ui.btn} to={ROUTES.contacts.path}>
                 Вызвать мастера
               </Link>
+              <a className={cx(ui.btn, ui.btnGhost)} href={`tel:${CONTACT_PHONE_HREF}`}>
+                {CONTACT_PHONE}
+              </a>
             </div>
 
             <dl className={styles.heroFacts}>
@@ -86,6 +87,15 @@ export const HomePage = observer(function HomePage() {
               </Reveal>
             ))}
           </div>
+
+          {/*
+            Единственный путь на витрину: из первого экрана кнопку убрали,
+            поэтому ссылка стоит в конце блока — после того, как человек
+            посмотрел подборку.
+          */}
+          <Link className={styles.moreLink} to={ROUTES.catalog.path}>
+            Смотреть всю витрину: кофе, техника и расходники →
+          </Link>
         </div>
       </section>
 

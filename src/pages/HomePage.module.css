@@ -191,6 +191,22 @@
   gap: 24px;
 }
 
+/* Ссылка на витрину в конце подборки: это не кнопка, а следующий шаг */
+.moreLink {
+  display: inline-block;
+  margin-top: 28px;
+  border-bottom: 1px solid transparent;
+  color: var(--accent);
+  transition:
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.moreLink:hover {
+  color: var(--cream);
+  border-bottom-color: currentColor;
+}
+
 .valuesSection {
   border-block: 1px solid var(--line);
   background: linear-gradient(180deg, rgba(224, 164, 94, 0.04), transparent);
@@ -401,9 +417,13 @@
 }
 
 @media (max-width: 640px) {
+  /*
+   * На телефоне факты из первого экрана убираем: они дублируют то, что ниже
+   * рассказано подробно, а на маленьком экране занимают целый блок и отодвигают
+   * кнопки. На планшете и компьютере блок остаётся.
+   */
   .heroFacts {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    display: none;
   }
 
   /* На узком экране плашки не выносим за кадр: иначе они обрезаются краем окна */
