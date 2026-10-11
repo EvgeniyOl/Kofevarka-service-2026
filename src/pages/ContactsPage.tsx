@@ -7,6 +7,12 @@ import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './ContactsPage.module.css'
 
+/** Координаты мастерской: улица Декабристов, 116/1, Омск */
+const MAP_POINT = { lat: 54.96602, lon: 73.39441, zoom: 17 }
+/** Виджет Яндекса: обычная страница карт в iframe запрещена (X-Frame-Options: DENY) */
+const MAP_EMBED_URL = `https://yandex.ru/map-widget/v1/?ll=${MAP_POINT.lon}%2C${MAP_POINT.lat}&z=${MAP_POINT.zoom}&pt=${MAP_POINT.lon},${MAP_POINT.lat},pm2rdm`
+const MAP_PAGE_URL = `https://yandex.ru/maps/?ll=${MAP_POINT.lon}%2C${MAP_POINT.lat}&z=${MAP_POINT.zoom}&pt=${MAP_POINT.lon},${MAP_POINT.lat},pm2rdm`
+
 /** Контакты: каналы связи, часы работы и форма с валидацией */
 export const ContactsPage = observer(function ContactsPage() {
   const { contacts } = useStore()
@@ -129,11 +135,34 @@ export const ContactsPage = observer(function ContactsPage() {
 
         <div className={styles.side}>
           <Reveal>
-            <div className={cx(ui.card, styles.map)}>
-              <span className={styles.mapPin} aria-hidden="true">
-                ☕
-              </span>
-              <span className={styles.mapLabel}>Мастерская · ул. Обжарочная, 12</span>
+            <div className={cx(ui.card, styles.mapCard)}>
+              {/* Карту грузим сразу: с loading="lazy" виджет Яндекса инициализируется
+                  уже после отложенной загрузки и остаётся пустым белым блоком.
+                  Под iframe — тёмная подложка, чтобы блок не выглядел пустым,
+                  пока карта грузится; ссылка на Яндекс Карты идёт ниже карты,
+                  поэтому сама карта остаётся кликабельной */}
+              <div className={styles.mapFrameWrap}>
+                <iframe
+                  className={styles.mapFrame}
+                  src={MAP_EMBED_URL}
+                  title="Мастерская на карте: улица Декабристов, 116/1, Омск"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+              <div className={styles.mapBar}>
+                <span className={styles.mapLabel}>
+                  Мастерская · улица Декабристов, 116/1, 1 этаж
+                </span>
+                <a
+                  className={styles.mapLink}
+                  href={MAP_PAGE_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  Открыть в Яндекс Картах
+                </a>
+              </div>
             </div>
           </Reveal>
 

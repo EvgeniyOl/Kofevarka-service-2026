@@ -34,22 +34,28 @@ export class ContactsStore {
     {
       icon: '📍',
       title: 'Мастерская',
-      value: 'ул. Обжарочная, 12, корпус 3',
-      hint: 'Пн–Пт 10:00–19:00, забор заказов до 18:30',
+      value: 'Улица Декабристов, 116/1, 1 этаж',
+      hint: 'Центральный округ, Омск, 644046',
     },
     {
       icon: '📞',
-      title: 'Телефон',
-      value: '+7 (900) 123-45-67',
-      hint: 'Отвечаем с 9:00 до 20:00, без ботов',
-      href: 'tel:+79001234567',
+      title: 'Справочная',
+      value: '+7 (3812) 38-13-76',
+      hint: 'Пн–сб 10:00–19:30',
+      href: 'tel:+73812381376',
+    },
+    {
+      icon: '🧾',
+      title: 'Отдел продаж',
+      value: '+7 903 927-13-76',
+      hint: '+7 913 634-30-85',
     },
     {
       icon: '✉️',
       title: 'Почта',
-      value: 'hello@kofevarka.service',
+      value: 'kofevarkaservice@yandex.ru',
       hint: 'Опт, сотрудничество и пресса',
-      href: 'mailto:hello@kofevarka.service',
+      href: 'mailto:kofevarkaservice@yandex.ru',
     },
     {
       icon: '☕',
@@ -60,9 +66,9 @@ export class ContactsStore {
   ]
 
   readonly hours: Array<{ day: string; time: string }> = [
-    { day: 'Понедельник — пятница', time: '10:00 — 19:00' },
-    { day: 'Суббота', time: '11:00 — 17:00' },
-    { day: 'Воскресенье', time: 'закрыто' },
+    { day: 'Пн — Пт', time: '10:00 — 19:00' },
+    { day: 'Суббота', time: '10:00 — 17:00' },
+    { day: 'Воскресенье', time: 'выходной' },
   ]
 
   form: ContactFields = { name: '', email: '', topic: 'order', message: '' }
