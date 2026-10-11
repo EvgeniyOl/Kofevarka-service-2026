@@ -30,11 +30,6 @@ export interface Product {
   description: string
   /** Базовая цена, ₽ */
   price: number
-  /**
-   * Вес одной единицы в граммах: у кофе — вес упаковки, у техники и расходников —
-   * вес самой вещи. Нужен, чтобы считать доставку по весу и порог «от 3 кг кофе».
-   */
-  weight: number
   /** Два цвета «сцены» карточки — вместо фотографии, чтобы не платить за картинки */
   scene: [string, string]
   /**
@@ -100,7 +95,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Универсальный характер: хорош и в эспрессо, и в фильтре. Мягкая сладость и понятная карамель.',
     price: 790,
-    weight: 250,
     scene: ['#4a3a24', '#8f6b3a'],
     badge: 'hit',
   },
@@ -115,7 +109,6 @@ export const PRODUCTS: Product[] = [
     description:
       'База для домашних эспрессо-смесей: низкая кислотность, ореховая сладость, густая текстура.',
     price: 690,
-    weight: 250,
     scene: ['#3f2a1c', '#7d4f2a'],
   },
   {
@@ -129,7 +122,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Натуральная обработка, ягоды сушатся целиком — отсюда яркая черника и цветочный аромат. Для фильтра и воронки.',
     price: 890,
-    weight: 250,
     scene: ['#4b2a4f', '#8c4a6b'],
     badge: 'new',
   },
@@ -144,7 +136,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Плотное тело и высокая кислотность — эталонный кенийский профиль. Зерно калибра AA, ручной отбор.',
     price: 950,
-    weight: 250,
     scene: ['#2f3f52', '#5d7f8c'],
     badge: 'limited',
   },
@@ -159,7 +150,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Декофеинизация тростниковым этилацетатом — без потери сладости. Вечерний вариант без кофеина.',
     price: 760,
-    weight: 250,
     scene: ['#3a2c46', '#6f5a86'],
     decaf: true,
   },
@@ -174,7 +164,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Наша рабочая смесь под молоко и автоматические кофемашины: стабильная от партии к партии.',
     price: 640,
-    weight: 250,
     scene: ['#43241d', '#9c4a33'],
     badge: 'hit',
   },
@@ -189,7 +178,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Автоматическая машина с жерновой кофемолкой и автокапучинатором. Простая в уходе, подходит для 2–6 чашек в день.',
     price: 42900,
-    weight: 9000,
     specs: ['15 бар', 'жерновая кофемолка', 'капучинатор', '1,8 л'],
     warranty: 24,
     scene: ['#2b3140', '#4d5a73'],
@@ -205,7 +193,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Два бойлера, PID-термостат и профессиональная группа — стабильный эспрессо даже в потоке.',
     price: 189000,
-    weight: 15000,
     specs: ['2 бойлера', 'PID', '58 мм группа', 'ротационный насос'],
     warranty: 24,
     scene: ['#3a2f2a', '#8a6a4f'],
@@ -220,7 +207,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Классика для домашнего эспрессо: настоящая группа, ремонтопригодная конструкция и запчасти в наличии.',
     price: 74900,
-    weight: 8000,
     specs: ['58 мм группа', '9 бар', 'ручной пар', 'корпус из стали'],
     warranty: 12,
     scene: ['#33383f', '#6f7b88'],
@@ -234,7 +220,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Тихая жерновая кофемолка с бесступенчатой регулировкой — держит помол под эспрессо день за днём.',
     price: 56900,
-    weight: 5600,
     specs: ['55 мм жернова', 'бесступенчатая регулировка', 'дисплей', '1,4 кг бункера'],
     warranty: 24,
     scene: ['#2f3336', '#7d7268'],
@@ -247,7 +232,6 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Ручная, для фильтра',
     description: 'Ручная кофемолка со стальными жерновами — берут в поездки и для альтернативы.',
     price: 8900,
-    weight: 700,
     specs: ['стальные жернова', 'S2C 660', 'алюминиевый корпус'],
     warranty: 12,
     scene: ['#3c352e', '#8d7a5f'],
@@ -263,7 +247,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Жидкий декальцинатор: убирает накипь в бойлере и продлевает срок службы машины. Хватает на 4 чистки.',
     price: 890,
-    weight: 600,
     volume: '500 мл',
     compatibleWith: ['De’Longhi', 'Philips', 'Gaggia', 'Rancilio'],
     scene: ['#243b46', '#4f8a9c'],
@@ -277,7 +260,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Убирают кофейные масла из группы и холдера. Одна таблетка на промывку, упаковка на 25 чисток.',
     price: 690,
-    weight: 400,
     volume: '25 шт',
     compatibleWith: ['Рожковые машины', 'Группа 58 мм', 'Группа 54 мм'],
     scene: ['#2b3a2f', '#5f8a6a'],
@@ -291,7 +273,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Смягчает воду до накипи: кофе раскрывается чище, а бойлер живёт дольше. Ресурс — 50 литров.',
     price: 1290,
-    weight: 300,
     volume: '1 шт',
     compatibleWith: ['De’Longhi', 'Philips', 'Nivona', 'Melitta'],
     scene: ['#2a3346', '#5a6f9c'],
@@ -304,7 +285,6 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Нержавеющая сталь',
     description: 'Ровная площадка и удобная ручка: температура держится, а таблетка не крошится.',
     price: 3400,
-    weight: 400,
     specs: ['58 мм', 'нержавеющая сталь', 'вес 320 г'],
     scene: ['#33302c', '#7a7166'],
   },
@@ -316,7 +296,6 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Для эспрессо и альтернативы',
     description: 'Точность 0,1 г и режим автостарта: считает вес чашки и время пролива без кнопок.',
     price: 24800,
-    weight: 500,
     specs: ['0,1 г', 'до 2 кг', 'автотаймер', 'USB-C'],
     warranty: 12,
     scene: ['#2c2c34', '#6d6d7a'],
@@ -333,7 +312,6 @@ export const PRODUCTS: Product[] = [
     description:
       'Привозим рабочую машину на время ремонта и забираем, когда ваша готова. Для кофеен и офисов — чтобы точка не встала, для дома — если без кофе никак.',
     price: 990,
-    weight: 0,
     specs: ['доставка и настройка', 'залог не нужен', 'при ремонте у нас — бесплатно'],
     scene: ['#2f3a4a', '#6b7f96'],
     photo: '/photos/machine-industrial.jpg',
@@ -344,19 +322,9 @@ export const PRODUCTS: Product[] = [
 export const formatPrice = (value: number): string =>
   `${new Intl.NumberFormat('ru-RU').format(Math.round(value))} ₽`
 
-/** Вес в граммах словами: 3000 → «3 кг», 250 → «250 г» */
-export const formatWeight = (grams: number): string => {
-  if (grams < 1000) return `${grams} г`
-  const kg = grams / 1000
-  return `${Number.isInteger(kg) ? kg : kg.toFixed(1).replace('.', ',')} кг`
-}
-
-/** Варианты для категории товара */
-export const variantsFor = (product: Product): Variant[] => VARIANT_OPTIONS[product.category]
-
-/** Множитель выбранного варианта */
-export const variantMultiplier = (product: Product, value: string): number =>
-  variantsFor(product).find((variant) => variant.value === value)?.multiplier ?? 1
+/** Множитель выбранного варианта: объём кофе или «1 шт» для техники */
+const variantMultiplier = (product: Product, value: string): number =>
+  VARIANT_OPTIONS[product.category].find((variant) => variant.value === value)?.multiplier ?? 1
 
 /** Цена конкретного варианта */
 export const priceFor = (product: Product, value: string): number =>

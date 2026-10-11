@@ -54,8 +54,6 @@ export const ROUTES = {
   },
 } as const satisfies Record<string, RouteMeta>
 
-export type RouteKey = keyof typeof ROUTES
-
 /**
  * Разделы для меню. Витрины и корзины в проекте нет: сайт рассказывает
  * о ремонте и подписке, а заказы принимаем по телефону и заявкой.

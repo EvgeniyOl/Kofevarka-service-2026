@@ -16,7 +16,7 @@ export interface FaqEntry {
 }
 
 /** Доставка только по Омску, поэтому способов два */
-export const METHODS: DeliveryMethodInfo[] = [
+const METHODS: DeliveryMethodInfo[] = [
   {
     id: 'courier',
     title: 'Курьер по Омску',

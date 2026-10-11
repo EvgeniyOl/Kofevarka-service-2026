@@ -11,10 +11,6 @@
   padding: 96px 0;
 }
 
-.sectionTight {
-  padding: 56px 0;
-}
-
 /*
  * Телефон: секции сжимаем. При отступе 96 px сверху и снизу между блоками
  * получалось почти 200 px пустоты — на маленьком экране это выглядит как
@@ -28,19 +24,11 @@
   .section {
     padding: 56px 0;
   }
-
-  .sectionTight {
-    padding: 40px 0;
-  }
 }
 
 @media (max-width: 480px) {
   .section {
     padding: 44px 0;
-  }
-
-  .sectionTight {
-    padding: 32px 0;
   }
 }
 
@@ -142,11 +130,6 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: linear-gradient(180deg, rgba(245, 236, 225, 0.05), rgba(245, 236, 225, 0.015));
-}
-
-.grid {
-  display: grid;
-  gap: 22px;
 }
 
 .input {
