@@ -39,12 +39,12 @@ export interface Product {
   scene: [string, string]
   /**
    * Фото товара. Если его нет, карточка показывает рисованную «сцену»:
-   * так витрина выглядит цельной, пока фотографии есть не для всех позиций.
+   * так подборка выглядит цельной, пока фотографии есть не для всех позиций.
    * Файлы лежат в public/photos, лицензии — в public/photos/CREDITS.md
    */
   photo?: string
   badge?: Badge
-  /** Раздел витрины внутри категории: «Кофемашины», «Кофемолки», «Чистящие средства» */
+  /** Подпись внутри категории: «Кофемашины», «Кофемолки», «Чистящие средства» */
   kind: string
 
   // — кофе —
@@ -61,21 +61,6 @@ export interface Product {
   // — расходники —
   compatibleWith?: string[]
   volume?: string
-}
-
-export const CATEGORY_LABELS: Record<Category, string> = {
-  coffee: 'Кофе',
-  machines: 'Техника',
-  supplies: 'Расходники',
-  service: 'Услуги',
-}
-
-/** Какие категории что продают — для подписей и SEO-текстов витрины */
-export const CATEGORY_HINTS: Record<Category, string> = {
-  coffee: 'Зерно от проверенных обжарщиков: фильтр, эспрессо, декоф',
-  machines: 'Кофемашины и кофемолки с гарантией и настройкой',
-  supplies: 'Чистящие средства, фильтры и аксессуары для ухода',
-  service: 'Подменная техника и работы мастерской',
 }
 
 export const VARIANT_OPTIONS: Record<Category, Variant[]> = {
@@ -95,14 +80,6 @@ export const GRIND_OPTIONS: ReadonlyArray<{ value: Grind; label: string; hint: s
   { value: 'filter', label: 'Фильтр', hint: 'V60, Aeropress, дрип' },
   { value: 'french', label: 'Френч-пресс', hint: 'Крупный помол' },
 ]
-
-export const ROAST_LABELS: Record<Roast, string> = {
-  1: 'очень светлая',
-  2: 'светлая',
-  3: 'средняя',
-  4: 'средне-тёмная',
-  5: 'тёмная',
-}
 
 export const BADGE_LABELS: Record<Badge, string> = {
   hit: 'Хит продаж',
@@ -385,19 +362,9 @@ export const variantMultiplier = (product: Product, value: string): number =>
 export const priceFor = (product: Product, value: string): number =>
   Math.round(product.price * variantMultiplier(product, value))
 
-/** Цена за 100 г — только для кофе: по ней удобно сравнивать 250 г, 500 г и килограмм */
-export const pricePer100 = (product: Product, value: string): number | null => {
-  const grams = Number(value)
-  if (product.category !== 'coffee' || !Number.isFinite(grams) || grams <= 0) return null
-  return Math.round((priceFor(product, value) / grams) * 100)
-}
-
 export const findProduct = (id: string): Product | undefined =>
   PRODUCTS.find((product) => product.id === id)
 
-/** Товары категории — для витрины, главной и подбора в подписке */
+/** Товары категории — для подбора кофе в подписке и подборки на главной */
 export const productsByCategory = (category: Category): Product[] =>
   PRODUCTS.filter((product) => product.category === category)
-
-/** Сколько всего позиций в категории — для подписей в интерфейсе */
-export const countByCategory = (category: Category): number => productsByCategory(category).length

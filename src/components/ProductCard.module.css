@@ -111,10 +111,6 @@
   background: linear-gradient(90deg, var(--accent), var(--accent-strong));
 }
 
-.roastText {
-  color: var(--muted);
-}
-
 .notes {
   display: flex;
   flex-wrap: wrap;
@@ -145,11 +141,6 @@
 .prices {
   display: flex;
   flex-direction: column;
-}
-
-.per100 {
-  font-size: 0.76rem;
-  color: var(--muted);
 }
 
 .add {

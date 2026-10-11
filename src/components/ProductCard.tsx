@@ -10,24 +10,20 @@ interface ProductCardProps {
   product: Product
   /** Выбранный вариант: объём кофе или «1 шт» для техники */
   variant: string
-  /** Помол — только для кофе */
-  grindLabel?: string
-  /** Цена за 100 г — только для кофе */
-  per100?: number | null
   className?: string
 }
 
 const ROAST_SCALE = [1, 2, 3, 4, 5] as const
 
 /**
- * Карточка товара. Компонент презентационный: вариант и помол передаёт страница,
- * поэтому карточку используют и главная, и витрина.
+ * Карточка товара для подборки на главной. Компонент презентационный:
+ * вариант передаёт страница.
  * Что показывать в теле — зависит от категории: у кофе это обжарка и
  * вкусовые ноты, у техники характеристики и гарантия, у расходников
  * совместимость и объём.
  * Кнопки покупки нет: сайт информационный, поэтому карточка ведёт на контакты.
  */
-export function ProductCard({ product, variant, grindLabel, per100, className }: ProductCardProps) {
+export function ProductCard({ product, variant, className }: ProductCardProps) {
   return (
     <article className={cx(ui.card, styles.card, className)}>
       <div className={styles.art}>
@@ -65,7 +61,6 @@ export function ProductCard({ product, variant, grindLabel, per100, className }:
                 />
               ))}
             </span>
-            {grindLabel ? <span className={styles.roastText}>{grindLabel}</span> : null}
           </div>
         ) : null}
 
@@ -105,7 +100,6 @@ export function ProductCard({ product, variant, grindLabel, per100, className }:
         <footer className={styles.footer}>
           <div className={styles.prices}>
             <span className={ui.price}>{formatPrice(priceFor(product, variant))}</span>
-            {per100 ? <span className={styles.per100}>{formatPrice(per100)} за 100 г</span> : null}
           </div>
           <Link className={cx(ui.btn, styles.add)} to={ROUTES.contacts.path}>
             Уточнить наличие

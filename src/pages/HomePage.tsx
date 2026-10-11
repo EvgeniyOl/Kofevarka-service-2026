@@ -75,9 +75,9 @@ export const HomePage = observer(function HomePage() {
       <section className={ui.section}>
         <div className={ui.container}>
           <SectionHeading
-            kicker="Витрина"
+            kicker="Что мы делаем"
             title="Что берут вместе с ремонтом"
-            lead="Техника с гарантией, расходники для ухода и подменная машина, если без кофе ждать не получается. Кофе и выбор объёма с помолом — в витрине."
+            lead="Технику привозим и настраиваем, расходники и подменную машину подбираем вместе с ремонтом. Наличие и цену уточняйте по телефону — соберём заказ и привезём."
           />
 
           <div className={styles.cards}>
@@ -87,15 +87,6 @@ export const HomePage = observer(function HomePage() {
               </Reveal>
             ))}
           </div>
-
-          {/*
-            Единственный путь на витрину: из первого экрана кнопку убрали,
-            поэтому ссылка стоит в конце блока — после того, как человек
-            посмотрел подборку.
-          */}
-          <Link className={styles.moreLink} to={ROUTES.catalog.path}>
-            Смотреть всю витрину: кофе, техника и расходники →
-          </Link>
         </div>
       </section>
 

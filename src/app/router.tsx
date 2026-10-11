@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { AboutPage } from '../pages/AboutPage'
-import { CatalogPage } from '../pages/CatalogPage'
 import { ContactsPage } from '../pages/ContactsPage'
 import { DeliveryPage } from '../pages/DeliveryPage'
 import { HomePage } from '../pages/HomePage'
@@ -21,7 +20,6 @@ export function AppRouter() {
         <Route element={<Layout />}>
           <Route path={ROUTES.home.path} element={<HomePage />} />
           <Route path={ROUTES.repair.path} element={<RepairPage />} />
-          <Route path={ROUTES.catalog.path} element={<CatalogPage />} />
           <Route path={ROUTES.subscription.path} element={<SubscriptionPage />} />
           <Route path={ROUTES.about.path} element={<AboutPage />} />
           <Route path={ROUTES.delivery.path} element={<DeliveryPage />} />
