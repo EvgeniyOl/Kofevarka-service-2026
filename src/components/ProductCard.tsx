@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router'
+import { ROUTES } from '../app/routes'
 import { BADGE_LABELS, formatPrice, priceFor, type Product } from '../data/products'
 import { CupArt } from './CupArt'
 import { cx } from '../utils/cx'
@@ -13,48 +14,34 @@ interface ProductCardProps {
   grindLabel?: string
   /** Цена за 100 г — только для кофе */
   per100?: number | null
-  onAdd: () => void
   className?: string
 }
 
 const ROAST_SCALE = [1, 2, 3, 4, 5] as const
 
 /**
- * Карточка товара. Компонент презентационный: вариант, помол и корзину
- * передаёт страница, поэтому карточку используют и главная, и витрина.
+ * Карточка товара. Компонент презентационный: вариант и помол передаёт страница,
+ * поэтому карточку используют и главная, и витрина.
  * Что показывать в теле — зависит от категории: у кофе это обжарка и
  * вкусовые ноты, у техники характеристики и гарантия, у расходников
  * совместимость и объём.
- * Подтверждение «в корзине» — локальный отклик кнопки, а не данные приложения.
+ * Кнопки покупки нет: сайт информационный, поэтому карточка ведёт на контакты.
  */
-export function ProductCard({
-  product,
-  variant,
-  grindLabel,
-  per100,
-  onAdd,
-  className,
-}: ProductCardProps) {
-  const [justAdded, setJustAdded] = useState(false)
-  const timer = useRef<number | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (timer.current !== null) window.clearTimeout(timer.current)
-    }
-  }, [])
-
-  const handleAdd = () => {
-    onAdd()
-    setJustAdded(true)
-    if (timer.current !== null) window.clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => setJustAdded(false), 1500)
-  }
-
+export function ProductCard({ product, variant, grindLabel, per100, className }: ProductCardProps) {
   return (
-    <article className={cx(ui.card, styles.card, justAdded && styles.added, className)}>
+    <article className={cx(ui.card, styles.card, className)}>
       <div className={styles.art}>
-        <CupArt scene={product.scene} />
+        {product.photo ? (
+          <img
+            className={styles.photo}
+            src={product.photo}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <CupArt scene={product.scene} />
+        )}
         {product.badge ? <span className={styles.badge}>{BADGE_LABELS[product.badge]}</span> : null}
         {product.decaf ? <span className={styles.decaf}>без кофеина</span> : null}
       </div>
@@ -120,13 +107,9 @@ export function ProductCard({
             <span className={ui.price}>{formatPrice(priceFor(product, variant))}</span>
             {per100 ? <span className={styles.per100}>{formatPrice(per100)} за 100 г</span> : null}
           </div>
-          <button
-            type="button"
-            className={cx(ui.btn, styles.add, justAdded && styles.addDone)}
-            onClick={handleAdd}
-          >
-            {justAdded ? 'В корзине ✓' : 'В корзину'}
-          </button>
+          <Link className={cx(ui.btn, styles.add)} to={ROUTES.contacts.path}>
+            Уточнить наличие
+          </Link>
         </footer>
       </div>
     </article>
