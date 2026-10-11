@@ -20,8 +20,8 @@ export const ContactsPage = observer(function ContactsPage() {
     <section className={cx(ui.container, styles.page)}>
       <SectionHeading
         kicker="Контакты"
-        title="Напишите — ответит человек, а не автоответчик"
-        lead="Обычно отвечаем в течение рабочего дня. По срочным заказам лучше звонить: так быстрее."
+        title="Ответит тот, кто сам жарит этот кофе"
+        lead="Пишите и звоните по делу обжарки: подскажем помол под ваш способ, соберём заказ и оставим его в мастерской на Декабристов."
       />
 
       <div className={styles.channels}>
