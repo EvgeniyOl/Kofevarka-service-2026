@@ -6,16 +6,28 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "types": [],
+    /* node — для бэкенда на функциях Vercel, vite/client — для import.meta.env */
+    "types": ["node", "vite/client"],
+
+    /*
+     * Функции Vercel выполняются как ESM, поэтому в их импортах указываем
+     * расширение .js (так требует Node), а файлы в проекте — .ts.
+     * Это отображение убирает расхождение: «./db.js» находит «db.ts».
+     */
+    "paths": {
+      "*.js": ["./*"]
+    },
 
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
+    /* Самопроверка запускается напрямую через node, поэтому импорты в ней с .ts */
+    "allowImportingTsExtensions": true,
 
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "api-dev-plugin.ts", "api"]
 }
