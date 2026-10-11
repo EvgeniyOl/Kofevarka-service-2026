@@ -72,7 +72,8 @@ Kofevarka/
 ├─ tsconfig*.json           # конфиги TypeScript (app / node)
 ├─ .husky/pre-commit        # хук: lint-staged + typecheck
 ├─ AGENTS.md                # правила проекта для ИИ-агентов (язык, стили, состояние, проверки)
-├─ public/coffee.svg        # иконка
+├─ public/logo.png          # фирменный знак: он же логотип в шапке и иконка вкладки
+├─ public/photos/           # фотографии товаров и героя, источники — в CREDITS.md
 └─ src/
    ├─ main.tsx              # бутстрап React + StoreProvider + AppRouter
    ├─ index.css             # глобально: сброс, токены, keyframes

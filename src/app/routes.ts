@@ -65,7 +65,7 @@ export type RouteKey = keyof typeof ROUTES
 
 /**
  * Разделы для меню — без витрины: в меню её нет,
- * попасть можно кнопкой «Вся витрина» с главной.
+ * попасть можно кнопкой «Смотреть витрину» с главной.
  */
 export const NAV_ROUTES: RouteMeta[] = [
   ROUTES.home,

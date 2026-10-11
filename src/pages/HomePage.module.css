@@ -183,13 +183,6 @@
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
-.featuredHead {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-}
-
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -441,7 +434,6 @@
     clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   }
 
-  .featuredHead,
   .cta {
     flex-direction: column;
     align-items: flex-start;

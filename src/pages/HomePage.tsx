@@ -73,16 +73,11 @@ export const HomePage = observer(function HomePage() {
 
       <section className={ui.section}>
         <div className={ui.container}>
-          <div className={styles.featuredHead}>
-            <SectionHeading
-              kicker="Витрина"
-              title="Что берут вместе с ремонтом"
-              lead="Техника с гарантией, расходники для ухода и подменная машина, если без кофе ждать не получается. Кофе и выбор объёма с помолом — в витрине."
-            />
-            <Link className={cx(ui.btn, ui.btnGhost)} to={ROUTES.catalog.path}>
-              Вся витрина
-            </Link>
-          </div>
+          <SectionHeading
+            kicker="Витрина"
+            title="Что берут вместе с ремонтом"
+            lead="Техника с гарантией, расходники для ухода и подменная машина, если без кофе ждать не получается. Кофе и выбор объёма с помолом — в витрине."
+          />
 
           <div className={styles.cards}>
             {home.featured.map((product, index) => (

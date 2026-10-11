@@ -1,7 +1,7 @@
-# Источники фотографий
+# Источники изображений
 
 Файлы `machine-*.jpg` — свободные изображения с Wikimedia Commons;
-`forge-dwarf.jpg` предоставил владелец проекта.
+`forge-dwarf.jpg` и фирменный знак — от владельца проекта.
 Ссылка на страницу файла обязательна, если лицензия требует атрибуции.
 
 | Файл                     | Что на фото                                | Лицензия                       | Автор                   | Источник                                                                                                                |
@@ -10,6 +10,12 @@
 | `machine-industrial.jpg` | Rancilio Classe 9 на барной стойке         | CC0 (public domain dedication) | Jordan Whitt (Unsplash) | [Industrial coffee machine](<https://commons.wikimedia.org/wiki/File:Industrial_coffee_machine_(Unsplash).jpg>)         |
 | `machine-grinding.jpg`   | Жерновые кофемолки с зерном                | CC0 (public domain dedication) | Crew (Unsplash)         | [Coffee machine grinding beans](<https://commons.wikimedia.org/wiki/File:Coffee_machine_grinding_beans_(Unsplash).jpg>) |
 | `forge-dwarf.jpg`        | Гном-кузнец у наковальни, летят искры      | предоставлено владельцем сайта | —                       | файл от заказчика, переименован из `15a655b34a93f3439dbf9175975c320a.jpg`                                               |
+
+## Фирменный знак
+
+`public/logo.png` — знак «Кофеварка Сервис» от владельца проекта. В работу взят
+вырезанный вариант без фона, из него собраны логотип в шапке и иконка вкладки:
+обрезан по границам диска, вписан в круг 480 × 480, кромка сглажена.
 
 ## Что это значит для сайта
 
