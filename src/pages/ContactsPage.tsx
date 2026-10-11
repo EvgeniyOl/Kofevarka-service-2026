@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
-import { TOPICS } from '../stores/ContactsStore'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
@@ -96,23 +95,6 @@ export const ContactsPage = observer(function ContactsPage() {
             </div>
 
             <label className={styles.field}>
-              <span className={styles.label}>Тема</span>
-              <select
-                className={ui.input}
-                value={contacts.form.topic}
-                onChange={(event) =>
-                  contacts.setField('topic', event.target.value as (typeof TOPICS)[number]['value'])
-                }
-              >
-                {TOPICS.map((topic) => (
-                  <option key={topic.value} value={topic.value}>
-                    {topic.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className={styles.field}>
               <span className={styles.label}>Сообщение</span>
               <textarea
                 className={cx(ui.input, styles.textarea)}
@@ -120,7 +102,7 @@ export const ContactsPage = observer(function ContactsPage() {
                 value={contacts.form.message}
                 onChange={(event) => contacts.setField('message', event.target.value)}
                 onBlur={() => contacts.touch('message')}
-                placeholder="Расскажите про задачу: объём, помол, сроки"
+                placeholder="напишите ваш вопрос"
               />
               {contacts.errorFor('message') ? (
                 <span className={ui.fieldError}>{contacts.errorFor('message')}</span>

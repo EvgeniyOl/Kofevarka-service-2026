@@ -1,11 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 
-export type ContactTopic = 'order' | 'wholesale' | 'workshop' | 'other'
-
 export interface ContactFields {
   name: string
   email: string
-  topic: ContactTopic
   message: string
 }
 
@@ -19,14 +16,8 @@ export interface ContactChannel {
   href?: string
 }
 
-export const TOPICS: ReadonlyArray<{ value: ContactTopic; label: string }> = [
-  { value: 'order', label: 'Вопрос по заказу' },
-  { value: 'wholesale', label: 'Опт и кофейни' },
-  { value: 'workshop', label: 'Воркшоп и обучение' },
-  { value: 'other', label: 'Другое' },
-]
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+const REQUIRED = 'обязательно для заполнения'
 
 /** Стор контактов: форма с валидацией и подписка на письма */
 export class ContactsStore {
@@ -57,12 +48,6 @@ export class ContactsStore {
       hint: 'Опт, сотрудничество и пресса',
       href: 'mailto:kofevarkaservice@yandex.ru',
     },
-    {
-      icon: '☕',
-      title: 'Дегустации',
-      value: 'Каждую субботу в 12:00',
-      hint: 'Бесплатно, по 8 человек, нужна запись',
-    },
   ]
 
   readonly hours: Array<{ day: string; time: string }> = [
@@ -71,11 +56,10 @@ export class ContactsStore {
     { day: 'Воскресенье', time: 'выходной' },
   ]
 
-  form: ContactFields = { name: '', email: '', topic: 'order', message: '' }
+  form: ContactFields = { name: '', email: '', message: '' }
   touched: Record<keyof ContactFields, boolean> = {
     name: false,
     email: false,
-    topic: false,
     message: false,
   }
   submitted = false
@@ -90,10 +74,12 @@ export class ContactsStore {
     const result: ContactErrors = {}
     const { name, email, message } = this.form
 
-    if (name.trim().length < 2) result.name = 'Как к вам обращаться?'
-    if (!EMAIL_RE.test(email.trim())) result.email = 'Проверьте адрес почты'
-    if (message.trim().length < 10)
-      result.message = 'Пара предложений о задаче — минимум 10 символов'
+    // Пустое поле и слишком короткое значение подсвечиваем одинаково:
+    // «обязательно для заполнения» — понятнее, чем подсказка про длину
+    if (name.trim().length < 2) result.name = REQUIRED
+    if (email.trim().length === 0) result.email = REQUIRED
+    else if (!EMAIL_RE.test(email.trim())) result.email = 'Проверьте адрес почты'
+    if (message.trim().length < 2) result.message = REQUIRED
 
     return result
   }
@@ -118,13 +104,13 @@ export class ContactsStore {
   }
 
   submit(): boolean {
-    this.touched = { name: true, email: true, topic: true, message: true }
+    this.touched = { name: true, email: true, message: true }
 
     if (!this.isValid) return false
 
     this.submitted = true
-    this.form = { name: '', email: '', topic: 'order', message: '' }
-    this.touched = { name: false, email: false, topic: false, message: false }
+    this.form = { name: '', email: '', message: '' }
+    this.touched = { name: false, email: false, message: false }
     return true
   }
 

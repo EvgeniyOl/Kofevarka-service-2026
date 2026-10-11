@@ -4,16 +4,10 @@
 
 .channels {
   display: grid;
-  /* Три колонки на десктопе: пять карточек ложатся как 3 + 2 без «сироты» в ряду */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Четыре карточки: на десктопе 2 + 2, без одинокой карточки в последнем ряду */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   margin-bottom: 40px;
-}
-
-@media (max-width: 1024px) {
-  .channels {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 560px) {
