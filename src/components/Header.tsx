@@ -1,7 +1,9 @@
+import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router'
+import { Link, NavLink, useNavigate } from 'react-router'
 import { NAV_ROUTES, ROUTES } from '../app/routes'
 import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '../data/contacts'
+import { useStore } from '../stores/context'
 import { Logo } from './Logo'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
@@ -12,7 +14,9 @@ import styles from './Header.module.css'
  * Открытое мобильное меню — единственное локальное состояние:
  * это элемент интерфейса, а не данные приложения.
  */
-export function Header() {
+export const Header = observer(function Header() {
+  const { auth } = useStore()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -25,6 +29,13 @@ export function Header() {
 
   // Перешли на другую страницу — меню закрываем
   const closeMenu = () => setMenuOpen(false)
+
+  const logout = async () => {
+    closeMenu()
+    await auth.logout()
+    navigate(ROUTES.home.path)
+  }
+
   return (
     <header className={cx(styles.header, scrolled && styles.scrolled)}>
       <div className={cx(ui.container, styles.bar)}>
@@ -80,6 +91,30 @@ export function Header() {
             </svg>
           </a>
 
+          {/*
+            Аккаунт: пока сессия проверяется, кнопку не показываем —
+            иначе при обновлении страницы мелькала бы «Войти», а затем имя.
+          */}
+          {auth.loading ? null : auth.isAuthenticated ? (
+            <div className={styles.account}>
+              {auth.isAdmin ? (
+                <NavLink to={ROUTES.admin.path} className={styles.accountLink}>
+                  Админка
+                </NavLink>
+              ) : null}
+              <span className={styles.accountName} title={auth.user?.email}>
+                {auth.user?.name}
+              </span>
+              <button type="button" className={styles.accountOut} onClick={logout}>
+                Выйти
+              </button>
+            </div>
+          ) : (
+            <NavLink to={ROUTES.login.path} className={cx(styles.accountLink, styles.accountEnter)}>
+              Войти
+            </NavLink>
+          )}
+
           <button
             type="button"
             className={cx(styles.burger, menuOpen && styles.burgerOpen)}
@@ -111,9 +146,37 @@ export function Header() {
                 </NavLink>
               </li>
             ))}
+
+            {/* В мобильном меню аккаунт показываем словами: в шапке он не помещается */}
+            {auth.loading ? null : auth.isAuthenticated ? (
+              <>
+                {auth.isAdmin ? (
+                  <li>
+                    <NavLink
+                      to={ROUTES.admin.path}
+                      className={styles.drawerLink}
+                      onClick={closeMenu}
+                    >
+                      Админка
+                    </NavLink>
+                  </li>
+                ) : null}
+                <li>
+                  <button type="button" className={styles.drawerLink} onClick={logout}>
+                    Выйти ({auth.user?.name})
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li>
+                <NavLink to={ROUTES.login.path} className={styles.drawerLink} onClick={closeMenu}>
+                  Войти
+                </NavLink>
+              </li>
+            )}
           </ul>
         </div>
       </div>
     </header>
   )
-}
+})

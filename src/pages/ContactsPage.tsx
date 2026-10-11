@@ -60,7 +60,7 @@ export const ContactsPage = observer(function ContactsPage() {
             noValidate
             onSubmit={(event) => {
               event.preventDefault()
-              contacts.submit()
+              void contacts.submit()
             }}
           >
             <div className={styles.grid2}>
@@ -109,8 +109,18 @@ export const ContactsPage = observer(function ContactsPage() {
               ) : null}
             </label>
 
-            <button className={ui.btn} type="submit" disabled={!contacts.isValid}>
-              Отправить сообщение
+            {contacts.serverError ? (
+              <p className={styles.formError} role="alert">
+                {contacts.serverError}
+              </p>
+            ) : null}
+
+            <button
+              className={ui.btn}
+              type="submit"
+              disabled={!contacts.isValid || contacts.sending}
+            >
+              {contacts.sending ? 'Отправляем…' : 'Отправить сообщение'}
             </button>
           </form>
         </div>

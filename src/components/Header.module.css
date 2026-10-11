@@ -111,6 +111,65 @@
   white-space: nowrap;
 }
 
+/*
+ * Аккаунт в шапке. Имя длинное, поэтому обрезаем его многоточием:
+ * иначе на планшете оно выдавливало телефон и меню.
+ */
+.account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.accountName {
+  max-width: 120px;
+  overflow: hidden;
+  font-size: 0.88rem;
+  color: var(--cream);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountLink {
+  font-size: 0.88rem;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.25s var(--ease);
+}
+
+.accountLink:hover {
+  color: var(--accent);
+}
+
+.accountEnter {
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--cream);
+}
+
+.accountOut {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.82rem;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.accountOut:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 /* Трубка нужна только там, где номер не помещается */
 .phoneIcon {
   display: none;
@@ -199,6 +258,15 @@
   .bar {
     gap: 14px;
   }
+
+  /*
+   * Блок аккаунта с именем и кнопкой занимает много места, а на планшете
+   * в шапке уже тесно. Прячем его целиком — те же действия есть в меню,
+   * куда мы их продублировали.
+   */
+  .account {
+    display: none;
+  }
 }
 
 @media (max-width: 620px) {
@@ -238,6 +306,14 @@
   .logoText em {
     font-size: 0.6rem;
     letter-spacing: 0.22em;
+  }
+
+  /*
+   * Кнопку входа в шапке на телефоне убираем: те же действия есть в меню,
+   * а рядом с логотипом, трубкой и бургером она делала строку тесной.
+   */
+  .accountEnter {
+    display: none;
   }
 
   .phone {

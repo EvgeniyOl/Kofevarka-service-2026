@@ -1,4 +1,5 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
+import { api, ApiError } from '../api/client'
 import {
   CONTACT_ADDRESS,
   CONTACT_ADDRESS_HINT,
@@ -74,6 +75,11 @@ export class ContactsStore {
   }
   submitted = false
 
+  /** Отправка заявки: показываем на кнопке, чтобы не отправили дважды */
+  sending = false
+  /** Ошибка сервера — её показываем рядом с формой, а не у поля */
+  serverError: string | null = null
+
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true })
   }
@@ -105,20 +111,48 @@ export class ContactsStore {
   setField<K extends keyof ContactFields>(field: K, value: ContactFields[K]): void {
     this.form[field] = value
     this.submitted = false
+    this.serverError = null
   }
 
   touch(field: keyof ContactFields): void {
     this.touched[field] = true
   }
 
-  submit(): boolean {
+  /**
+   * Отправка заявки на сервер: она попадает в базу, а админ видит её
+   * в админке. Поля очищаем только после успешного ответа — иначе человек
+   * потерял бы написанное из-за сетевой ошибки.
+   */
+  async submit(): Promise<boolean> {
     this.touched = { name: true, email: true, message: true }
 
-    if (!this.isValid) return false
+    if (!this.isValid || this.sending) return false
 
-    this.submitted = true
-    this.form = { name: '', email: '', message: '' }
-    this.touched = { name: false, email: false, message: false }
-    return true
+    this.sending = true
+    this.serverError = null
+
+    try {
+      await api.createRequest({
+        name: this.form.name.trim(),
+        email: this.form.email.trim(),
+        message: this.form.message.trim(),
+      })
+
+      runInAction(() => {
+        this.submitted = true
+        this.form = { name: '', email: '', message: '' }
+        this.touched = { name: false, email: false, message: false }
+      })
+      return true
+    } catch (error) {
+      runInAction(() => {
+        this.serverError = error instanceof ApiError ? error.message : 'Не удалось отправить заявку'
+      })
+      return false
+    } finally {
+      runInAction(() => {
+        this.sending = false
+      })
+    }
   }
 }
