@@ -1,0 +1,84 @@
+.page {
+  padding: 64px 0 80px;
+}
+
+/* Форма узкая и по центру: так её удобнее заполнять с телефона */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 460px);
+  justify-content: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 32px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.lead {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hint {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.error {
+  padding: 12px 14px;
+  border: 1px solid rgba(184, 84, 63, 0.5);
+  border-radius: var(--radius-sm);
+  background: rgba(184, 84, 63, 0.12);
+  font-size: 0.9rem;
+  color: #f0c2b8;
+}
+
+.switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.switch a {
+  color: var(--accent);
+  border-bottom: 1px solid transparent;
+}
+
+.switch a:hover {
+  border-bottom-color: currentColor;
+}
+
+@media (max-width: 560px) {
+  .card {
+    padding: 22px 18px;
+  }
+}

@@ -52,6 +52,28 @@ export const ROUTES = {
     title: 'Контакты — Kofevarka Service',
     description: 'Мастерская, телефоны, почта и форма заявки на ремонт.',
   },
+  /*
+   * Вход, регистрация и админка в меню не выводятся: в шапке для них
+   * отдельные кнопки, а админка закрыта ролью (см. RequireAuth).
+   */
+  login: {
+    path: '/login',
+    label: 'Вход',
+    title: 'Вход — Kofevarka Service',
+    description: 'Вход в личный кабинет.',
+  },
+  register: {
+    path: '/register',
+    label: 'Регистрация',
+    title: 'Регистрация — Kofevarka Service',
+    description: 'Создание аккаунта на сайте мастерской.',
+  },
+  admin: {
+    path: '/admin',
+    label: 'Админка',
+    title: 'Админка — Kofevarka Service',
+    description: 'Заявки с сайта и управление пользователями.',
+  },
 } as const satisfies Record<string, RouteMeta>
 
 /**
