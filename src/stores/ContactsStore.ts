@@ -1,4 +1,14 @@
 import { makeAutoObservable } from 'mobx'
+import {
+  CONTACT_ADDRESS,
+  CONTACT_ADDRESS_HINT,
+  CONTACT_EMAIL,
+  CONTACT_HOURS_SHORT,
+  CONTACT_PHONE,
+  CONTACT_PHONE_HREF,
+  CONTACT_SALES_PHONE,
+  CONTACT_SALES_PHONE_EXTRA,
+} from '../data/contacts'
 
 export interface ContactFields {
   name: string
@@ -19,34 +29,34 @@ export interface ContactChannel {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const REQUIRED = 'обязательно для заполнения'
 
-/** Стор контактов: форма с валидацией и подписка на письма */
+/** Стор контактов: справочные данные и форма заявки с валидацией */
 export class ContactsStore {
   readonly channels: ContactChannel[] = [
     {
       icon: '📍',
       title: 'Мастерская',
-      value: 'Улица Декабристов, 116/1, 1 этаж',
-      hint: 'Центральный округ, Омск, 644046',
+      value: CONTACT_ADDRESS,
+      hint: CONTACT_ADDRESS_HINT,
     },
     {
       icon: '📞',
       title: 'Справочная',
-      value: '+7 (3812) 38-13-76',
-      hint: 'Пн–сб 10:00–19:30',
-      href: 'tel:+73812381376',
+      value: CONTACT_PHONE,
+      hint: CONTACT_HOURS_SHORT,
+      href: `tel:${CONTACT_PHONE_HREF}`,
     },
     {
       icon: '🧾',
       title: 'Отдел продаж',
-      value: '+7 903 927-13-76',
-      hint: '+7 913 634-30-85',
+      value: CONTACT_SALES_PHONE,
+      hint: CONTACT_SALES_PHONE_EXTRA,
     },
     {
       icon: '✉️',
       title: 'Почта',
-      value: 'kofevarkaservice@yandex.ru',
+      value: CONTACT_EMAIL,
       hint: 'Опт, сотрудничество и пресса',
-      href: 'mailto:kofevarkaservice@yandex.ru',
+      href: `mailto:${CONTACT_EMAIL}`,
     },
   ]
 

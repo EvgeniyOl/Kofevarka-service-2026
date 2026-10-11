@@ -22,6 +22,11 @@
   color: var(--accent);
 }
 
+/* Суффикс у цифры: «7 лет», а не «7лет» */
+.suffix {
+  margin-left: 0.3em;
+}
+
 .timelineBlock {
   margin-bottom: 56px;
 }

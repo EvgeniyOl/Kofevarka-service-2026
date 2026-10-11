@@ -9,7 +9,6 @@ import {
   type Product,
   type Roast,
 } from '../data/products'
-import type { CartStore } from './CartStore'
 
 export type SortKey = 'popular' | 'price-asc' | 'price-desc'
 export type CategoryFilter = Category | 'all'
@@ -22,17 +21,16 @@ export const SORT_OPTIONS: ReadonlyArray<{ value: SortKey; label: string }> = [
 
 export const CATEGORY_FILTERS: ReadonlyArray<{ value: CategoryFilter; label: string }> = [
   { value: 'all', label: 'Всё' },
-  { value: 'coffee', label: 'Кофе' },
   { value: 'machines', label: 'Техника' },
+  { value: 'coffee', label: 'Кофе' },
   { value: 'supplies', label: 'Расходники' },
+  { value: 'service', label: 'Услуги' },
 ]
 
 const BADGE_WEIGHT: Record<Badge, number> = { hit: 3, new: 2, limited: 1 }
 
-/** Витрина: фильтры по категории и обжарке, сортировка и добавление в корзину */
+/** Витрина: фильтры по категории и обжарке плюс сортировка */
 export class CatalogStore {
-  private readonly cart: CartStore
-
   search = ''
   category: CategoryFilter = 'all'
   /** Обжарка есть только у кофе, поэтому фильтр работает в паре с категорией */
@@ -42,12 +40,9 @@ export class CatalogStore {
   /** Объём кофе и помол, выбранные в карточках витрины */
   coffeeSize = '250'
   grind: Grind = 'beans'
-  /** id товара, который только что добавили — для вспышки «добавлено» */
-  lastAddedId: string | null = null
 
-  constructor(cart: CartStore) {
-    this.cart = cart
-    makeAutoObservable<CatalogStore, 'cart'>(this, { cart: false }, { autoBind: true })
+  constructor() {
+    makeAutoObservable(this, {}, { autoBind: true })
   }
 
   get visible(): Product[] {
@@ -152,16 +147,7 @@ export class CatalogStore {
     this.grind = value
   }
 
-  /** Помол передаём только для кофе — в корзине у техники его нет */
-  addToCart(product: Product): void {
-    if (product.category === 'coffee') {
-      this.cart.add(product.id, this.coffeeSize, this.grind)
-    } else {
-      this.cart.add(product.id, '1')
-    }
-    this.lastAddedId = product.id
-  }
-
+  /** Помол передаём только для кофе — у техники и расходников его нет */
   resetFilters(): void {
     this.search = ''
     this.category = 'all'

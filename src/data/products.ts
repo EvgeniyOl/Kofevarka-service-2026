@@ -216,6 +216,7 @@ export const PRODUCTS: Product[] = [
     specs: ['15 бар', 'жерновая кофемолка', 'капучинатор', '1,8 л'],
     warranty: 24,
     scene: ['#2b3140', '#4d5a73'],
+    photo: '/photos/machine-modern.jpg',
     badge: 'hit',
   },
   {
@@ -358,6 +359,7 @@ export const PRODUCTS: Product[] = [
     weight: 0,
     specs: ['доставка и настройка', 'залог не нужен', 'при ремонте у нас — бесплатно'],
     scene: ['#2f3a4a', '#6b7f96'],
+    photo: '/photos/machine-industrial.jpg',
     badge: 'hit',
   },
 ]

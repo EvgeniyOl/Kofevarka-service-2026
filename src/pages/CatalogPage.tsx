@@ -30,7 +30,7 @@ const GRIND_LABELS: Record<string, string> = Object.fromEntries(
 
 /**
  * Витрина: техника, кофе и расходники. Поиск, фильтр по категории и обжарке,
- * сортировка и добавление в корзину. Объём и помол относятся только к кофе —
+ * сортировка. Объём и помол относятся только к кофе —
  * для остальных категорий скрыты.
  */
 export const CatalogPage = observer(function CatalogPage() {
@@ -185,7 +185,6 @@ export const CatalogPage = observer(function CatalogPage() {
                   variant={variant}
                   grindLabel={isCoffee ? GRIND_LABELS[catalog.grind] : undefined}
                   per100={isCoffee ? pricePer100(product, variant) : null}
-                  onAdd={() => catalog.addToCart(product)}
                 />
               </Reveal>
             )

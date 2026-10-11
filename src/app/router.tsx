@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { AboutPage } from '../pages/AboutPage'
-import { CartPage } from '../pages/CartPage'
 import { CatalogPage } from '../pages/CatalogPage'
 import { ContactsPage } from '../pages/ContactsPage'
 import { DeliveryPage } from '../pages/DeliveryPage'
@@ -27,7 +26,6 @@ export function AppRouter() {
           <Route path={ROUTES.about.path} element={<AboutPage />} />
           <Route path={ROUTES.delivery.path} element={<DeliveryPage />} />
           <Route path={ROUTES.contacts.path} element={<ContactsPage />} />
-          <Route path={ROUTES.cart.path} element={<CartPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

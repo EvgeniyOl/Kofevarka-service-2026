@@ -50,8 +50,8 @@ export const ROUTES = {
   delivery: {
     path: '/delivery',
     label: 'Доставка',
-    title: 'Доставка и оплата — Kofevarka Service',
-    description: 'Курьер по городу, пункты выдачи и почта. Считаем стоимость и сроки.',
+    title: 'Доставка по Омску — Kofevarka Service',
+    description: 'Курьер по городу бесплатно от 3 кг кофе и самовывоз из мастерской.',
   },
   contacts: {
     path: '/contacts',
@@ -59,21 +59,17 @@ export const ROUTES = {
     title: 'Контакты — Kofevarka Service',
     description: 'Мастерская, телефоны, почта и форма заявки на ремонт.',
   },
-  cart: {
-    path: '/cart',
-    label: 'Корзина',
-    title: 'Корзина — Kofevarka Service',
-    description: 'Ваш заказ, промокод и итоговая сумма.',
-  },
 } as const satisfies Record<string, RouteMeta>
 
 export type RouteKey = keyof typeof ROUTES
 
-/** Разделы для меню — без корзины, она живёт отдельной кнопкой в шапке */
+/**
+ * Разделы для меню — без витрины: в меню её нет,
+ * попасть можно кнопкой «Вся витрина» с главной.
+ */
 export const NAV_ROUTES: RouteMeta[] = [
   ROUTES.home,
   ROUTES.repair,
-  ROUTES.catalog,
   ROUTES.subscription,
   ROUTES.about,
   ROUTES.delivery,

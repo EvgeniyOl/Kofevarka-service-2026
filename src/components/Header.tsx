@@ -1,21 +1,18 @@
-import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router'
+import { Link, NavLink } from 'react-router'
 import { NAV_ROUTES, ROUTES } from '../app/routes'
-import { useStore } from '../stores/context'
+import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '../data/contacts'
 import { Logo } from './Logo'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './Header.module.css'
 
 /**
- * Шапка: липкая, с размытием и счётчиком корзины.
+ * Шапка: липкая, с размытием и телефоном мастерской.
  * Открытое мобильное меню — единственное локальное состояние:
  * это элемент интерфейса, а не данные приложения.
  */
-export const Header = observer(function Header() {
-  const { cart } = useStore()
-  const { pathname } = useLocation()
+export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -27,8 +24,7 @@ export const Header = observer(function Header() {
   }, [])
 
   // Перешли на другую страницу — меню закрываем
-  useEffect(() => setMenuOpen(false), [pathname])
-
+  const closeMenu = () => setMenuOpen(false)
   return (
     <header className={cx(styles.header, scrolled && styles.scrolled)}>
       <div className={cx(ui.container, styles.bar)}>
@@ -58,14 +54,9 @@ export const Header = observer(function Header() {
         </nav>
 
         <div className={styles.actions}>
-          <Link to={ROUTES.cart.path} className={cx(ui.btn, ui.btnGhost, styles.cart)}>
-            Корзина
-            {cart.count > 0 ? (
-              <span key={cart.count} className={styles.badge}>
-                {cart.count}
-              </span>
-            ) : null}
-          </Link>
+          <a className={cx(ui.btn, ui.btnGhost, styles.phone)} href={`tel:${CONTACT_PHONE_HREF}`}>
+            {CONTACT_PHONE}
+          </a>
 
           <button
             type="button"
@@ -92,6 +83,7 @@ export const Header = observer(function Header() {
                   className={({ isActive }) =>
                     cx(styles.drawerLink, isActive && styles.drawerLinkActive)
                   }
+                  onClick={closeMenu}
                 >
                   {route.label}
                 </NavLink>
@@ -102,4 +94,4 @@ export const Header = observer(function Header() {
       </div>
     </header>
   )
-})
+}

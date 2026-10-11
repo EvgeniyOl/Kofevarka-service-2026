@@ -1,5 +1,6 @@
 .card {
   display: flex;
+  height: 100%;
   flex-direction: column;
   overflow: hidden;
   transition:
@@ -14,13 +15,23 @@
   box-shadow: var(--shadow);
 }
 
-.added {
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-}
-
 .art {
   position: relative;
   padding: 10px 10px 0;
+}
+
+/* Фото товара в той же рамке, что и рисованная «сцена» */
+.photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  transition: transform 0.5s var(--ease);
+}
+
+.card:hover .photo {
+  transform: scale(1.03);
 }
 
 .badge,
@@ -144,10 +155,5 @@
 .add {
   padding: 12px 20px;
   font-size: 0.92rem;
-}
-
-.addDone {
-  background: linear-gradient(135deg, var(--ok), #5f8a4c);
-  color: #10190c;
-  animation: popIn 0.35s var(--ease);
+  text-align: center;
 }

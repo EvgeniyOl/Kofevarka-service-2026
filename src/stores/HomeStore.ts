@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import { findProduct, type Grind, type Product } from '../data/products'
-import type { CartStore } from './CartStore'
+import { findProduct, type Product } from '../data/products'
 
 export interface HomeStat {
   value: number
@@ -32,8 +31,6 @@ export interface HomeTestimonial {
  * и отзывы.
  */
 export class HomeStore {
-  private readonly cart: CartStore
-
   readonly company = 'Kofevarka Service'
   readonly kicker = 'Ремонт кофемашин и кофе · мастерская в Омске с 2019 года'
   readonly heroTitle = 'Починим машину, подберём зерно'
@@ -42,8 +39,8 @@ export class HomeStore {
 
   readonly stats: HomeStat[] = [
     { value: 4200, suffix: 'машин', label: 'Отремонтировали с 2019 года' },
-    { value: 6, suffix: 'месяцев', label: 'Гарантия на работы' },
-    { value: 1, suffix: 'день', label: 'На диагностику' },
+    { value: 6, suffix: 'месяцев', label: 'Гарантия на работу и запчасти' },
+    { value: 1, suffix: 'день', label: 'Занимает диагностика' },
     { value: 4.9, suffix: '★', label: 'Средняя оценка сервиса' },
   ]
 
@@ -110,59 +107,20 @@ export class HomeStore {
     },
   ]
 
-  /** Что показываем на главной: техника и кофе вперемешку */
-  readonly featuredIds = [
-    'delonghi-magnifica-s',
-    'espresso-blend',
-    'eureka-mignon-specialita',
-    'descaler-liquid',
-  ]
+  /**
+   * Подборка на главной: техника, расходник и услуга подменной машины.
+   * Кофе не показываем — в карточке негде выбрать объём и помол,
+   * для этого есть витрина.
+   */
+  readonly featuredIds = ['delonghi-magnifica-s', 'service-loan-machine', 'descaler-liquid']
 
-  /** Объём и помол для карточек кофе, а также способ заваривания в рецепте */
-  coffeeSize = '250'
-  grind: Grind = 'beans'
-  brews: Array<{ id: string; label: string; ratio: string; time: string; temp: string }> = []
-  activeBrewId = 'v60'
-
-  constructor(cart: CartStore) {
-    this.cart = cart
-    this.brews = [
-      { id: 'v60', label: 'V60', ratio: '1:16', time: '2:30', temp: '94 °C' },
-      { id: 'aeropress', label: 'Aeropress', ratio: '1:13', time: '1:45', temp: '88 °C' },
-      { id: 'espresso', label: 'Эспрессо', ratio: '1:2', time: '27 с', temp: '93 °C' },
-      { id: 'french', label: 'Френч-пресс', ratio: '1:15', time: '4:00', temp: '96 °C' },
-    ]
-    makeAutoObservable<HomeStore, 'cart'>(this, { cart: false }, { autoBind: true })
+  constructor() {
+    makeAutoObservable(this, {}, { autoBind: true })
   }
 
   get featured(): Product[] {
     return this.featuredIds
       .map((id) => findProduct(id))
       .filter((product): product is Product => Boolean(product))
-  }
-
-  get activeBrew(): { id: string; label: string; ratio: string; time: string; temp: string } {
-    return this.brews.find((brew) => brew.id === this.activeBrewId) ?? this.brews[0]
-  }
-
-  setCoffeeSize(value: string): void {
-    this.coffeeSize = value
-  }
-
-  setGrind(value: Grind): void {
-    this.grind = value
-  }
-
-  setBrew(id: string): void {
-    this.activeBrewId = id
-  }
-
-  /** Помол передаём только для кофе: у техники и расходников его нет */
-  addToCart(product: Product): void {
-    if (product.category === 'coffee') {
-      this.cart.add(product.id, this.coffeeSize, this.grind)
-    } else {
-      this.cart.add(product.id, '1')
-    }
   }
 }

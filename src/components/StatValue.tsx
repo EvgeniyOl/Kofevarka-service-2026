@@ -1,16 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
+import { cx } from '../utils/cx'
 
 interface StatValueProps {
   value: number
   suffix: string
+  /** Класс для суффикса: отступ задаёт вызывающая сторона */
+  suffixClassName?: string
 }
 
 /**
  * Число, которое «набегает» при попадании в кадр.
+ * Суффикс выводится отдельным элементом, чтобы «4200» и «машин» не слипались —
+ * отступ для него задаёт страница через suffixClassName.
  * Живёт отдельным файлом: react-refresh требует, чтобы файл страницы
  * экспортировал только компоненты страницы, без лишних сущностей.
  */
-export function StatValue({ value, suffix }: StatValueProps) {
+export function StatValue({ value, suffix, suffixClassName }: StatValueProps) {
   const ref = useRef<HTMLSpanElement | null>(null)
   const [shown, setShown] = useState(0)
   const isFloat = !Number.isInteger(value)
@@ -46,8 +51,8 @@ export function StatValue({ value, suffix }: StatValueProps) {
 
   return (
     <span ref={ref}>
-      {isFloat ? shown.toFixed(1) : Math.round(shown)}
-      {suffix}
+      {isFloat ? shown.toFixed(1).replace('.', ',') : Math.round(shown)}
+      <span className={cx(suffixClassName)}>{suffix}</span>
     </span>
   )
 }

@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
+import { StatValue } from '../components/StatValue'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
@@ -21,8 +22,11 @@ export const AboutPage = observer(function AboutPage() {
           <Reveal key={item.label} delay={index * 70}>
             <div className={cx(ui.card, styles.number)}>
               <span className={styles.numberValue}>
-                {item.value}
-                {item.suffix}
+                <StatValue
+                  value={item.value}
+                  suffix={item.suffix}
+                  suffixClassName={styles.suffix}
+                />
               </span>
               <span className={ui.muted}>{item.label}</span>
             </div>

@@ -1,5 +1,4 @@
 import { AboutStore } from './AboutStore'
-import { CartStore } from './CartStore'
 import { CatalogStore } from './CatalogStore'
 import { ContactsStore } from './ContactsStore'
 import { DeliveryStore } from './DeliveryStore'
@@ -8,11 +7,10 @@ import { RepairStore } from './RepairStore'
 import { SubscriptionStore } from './SubscriptionStore'
 
 /**
- * Корневой стор приложения: у каждого раздела свой стор,
- * а корзина — общая, её читает и шапка, и страница заказа.
+ * Корневой стор приложения: у каждого раздела свой стор.
+ * Корзины нет — сайт информационный, заказы принимаем по телефону и заявкой.
  */
 export class RootStore {
-  readonly cart: CartStore
   readonly home: HomeStore
   readonly repair: RepairStore
   readonly catalog: CatalogStore
@@ -22,11 +20,10 @@ export class RootStore {
   readonly contacts: ContactsStore
 
   constructor() {
-    this.cart = new CartStore()
-    this.home = new HomeStore(this.cart)
+    this.home = new HomeStore()
     this.repair = new RepairStore()
-    this.catalog = new CatalogStore(this.cart)
-    this.subscription = new SubscriptionStore(this.cart)
+    this.catalog = new CatalogStore()
+    this.subscription = new SubscriptionStore()
     this.about = new AboutStore()
     this.delivery = new DeliveryStore()
     this.contacts = new ContactsStore()

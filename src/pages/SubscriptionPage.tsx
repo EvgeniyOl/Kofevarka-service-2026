@@ -172,22 +172,28 @@ export const SubscriptionPage = observer(function SubscriptionPage() {
               </span>
             </div>
 
+            <p className={ui.muted}>
+              Наберёте 2 кг кофе в месяц — чистка и обслуживание кофемашины бесплатно: приезжаем,
+              промываем гидросистему и проверяем помол. Доставка по Омску входит.
+            </p>
+
             {subscription.subscribed ? (
               <div className={styles.success}>
                 <p>
-                  Подписка оформлена: {subscription.currentPlan.bags} × {subscription.size} г уехали
-                  в корзину, письмо придёт на {subscription.email}.
+                  Заявка принята: {subscription.currentPlan.bags} × {subscription.size} г,{' '}
+                  {subscription.deliveriesPerMonth} доставки в месяц. Позвоним на подтверждение и
+                  напишем на {subscription.email}.
                 </p>
                 <div className={styles.successActions}>
-                  <Link className={ui.btn} to={ROUTES.cart.path}>
-                    Перейти в корзину
+                  <Link className={ui.btn} to={ROUTES.contacts.path}>
+                    Наши контакты
                   </Link>
                   <button
                     type="button"
                     className={cx(ui.btn, ui.btnGhost)}
                     onClick={() => subscription.reset()}
                   >
-                    Оформить ещё
+                    Оставить ещё заявку
                   </button>
                 </div>
               </div>
@@ -213,11 +219,11 @@ export const SubscriptionPage = observer(function SubscriptionPage() {
                   <span className={ui.fieldError}>{subscription.emailError}</span>
                 ) : null}
                 <button className={ui.btn} type="submit">
-                  Оформить подписку
+                  Оставить заявку
                 </button>
                 <p className={styles.note}>
-                  Скидка {subscription.discountPercent} % уже в цене. Отменить можно в любой момент
-                  — без звонков и писем в поддержку.
+                  Оплаты на сайте нет: подтвердим состав и удобный день доставки по телефону. Скидка{' '}
+                  {subscription.discountPercent} % уже в цене, отменить можно в любой момент.
                 </p>
               </form>
             )}

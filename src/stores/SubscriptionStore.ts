@@ -1,6 +1,5 @@
 import { makeAutoObservable } from 'mobx'
 import { findProduct, priceFor, productsByCategory, type Grind } from '../data/products'
-import type { CartStore } from './CartStore'
 
 export type PlanKind = 'solo' | 'duo' | 'office'
 export type FrequencyWeeks = 1 | 2 | 4
@@ -45,8 +44,6 @@ export const FREQUENCIES: ReadonlyArray<{ value: FrequencyWeeks; label: string }
 
 /** Стор подписки: конструктор плана и расчёт стоимости */
 export class SubscriptionStore {
-  private readonly cart: CartStore
-
   plan: PlanKind = 'solo'
   frequency: FrequencyWeeks = 2
   /** Объём кофе в подписке: «250», «500» или «1000» */
@@ -57,9 +54,8 @@ export class SubscriptionStore {
   subscribed = false
   emailError: string | null = null
 
-  constructor(cart: CartStore) {
-    this.cart = cart
-    makeAutoObservable<SubscriptionStore, 'cart'>(this, { cart: false }, { autoBind: true })
+  constructor() {
+    makeAutoObservable(this, {}, { autoBind: true })
   }
 
   get plans(): PlanConfig[] {
@@ -151,15 +147,14 @@ export class SubscriptionStore {
     this.emailError = null
   }
 
-  /** Первая доставка уезжает в корзину, подписка отмечается оформленной */
+  /**
+   * Заявка на подписку: оплаты на сайте нет, поэтому просто отмечаем,
+   * что человек оставил почту — состав и день доставки подтвердим по телефону.
+   */
   subscribe(): boolean {
     if (!this.isEmailValid) {
       this.emailError = 'Нужна почта, чтобы присылать напоминания о доставке'
       return false
-    }
-
-    for (let index = 0; index < this.currentPlan.bags; index += 1) {
-      this.cart.add(this.productId, this.size, this.grind)
     }
 
     this.subscribed = true

@@ -6,29 +6,19 @@ import { ProductCard } from '../components/ProductCard'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
 import { StatValue } from '../components/StatValue'
-import {
-  GRIND_OPTIONS,
-  VARIANT_OPTIONS,
-  formatPrice,
-  pricePer100,
-  priceFor,
-} from '../data/products'
+import { formatPrice, priceFor } from '../data/products'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './HomePage.module.css'
 
-const GRIND_LABELS: Record<string, string> = Object.fromEntries(
-  GRIND_OPTIONS.map((option) => [option.value, option.label]),
-)
-
 /** Главная: ремонт кофемашин и кофе — герой, избранное, порядок работ, цифры, отзывы */
 export const HomePage = observer(function HomePage() {
   const { home } = useStore()
-  const cheapest = home.featured.reduce((min, product) => {
-    const variant = product.category === 'coffee' ? home.coffeeSize : '1'
-    return Math.min(min, priceFor(product, variant))
-  }, Number.POSITIVE_INFINITY)
+  const cheapest = home.featured.reduce(
+    (min, product) => Math.min(min, priceFor(product, '1')),
+    Number.POSITIVE_INFINITY,
+  )
 
   return (
     <>
@@ -64,13 +54,13 @@ export const HomePage = observer(function HomePage() {
               </div>
               <div>
                 <dt>Доставка</dt>
-                <dd>от 2500 ₽ — бесплатно</dd>
+                <dd>по Омску, от 3 кг — бесплатно</dd>
               </div>
             </dl>
           </div>
 
           <div className={styles.heroArt}>
-            <ForgeArt variant="hero" />
+            <ForgeArt variant="hero" photo="/photos/forge-dwarf.jpg" />
             <span className={cx(styles.floatCard, styles.floatTop)}>
               <b>Диагностика</b> за один день
             </span>
@@ -87,60 +77,19 @@ export const HomePage = observer(function HomePage() {
             <SectionHeading
               kicker="Витрина"
               title="Что берут вместе с ремонтом"
-              lead="Техника с гарантией, зерно обжарщиков и расходники для ухода. Для кофе объём и помол выбираются прямо в карточке — цена и цена за 100 грамм пересчитаются сами."
+              lead="Техника с гарантией, расходники для ухода и подменная машина, если без кофе ждать не получается. Кофе и выбор объёма с помолом — в витрине."
             />
             <Link className={cx(ui.btn, ui.btnGhost)} to={ROUTES.catalog.path}>
               Вся витрина
             </Link>
           </div>
 
-          <div className={styles.toolbar}>
-            <div className={styles.toolGroup}>
-              <span className={styles.toolLabel}>Объём кофе</span>
-              {VARIANT_OPTIONS.coffee.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={cx(styles.tool, home.coffeeSize === option.value && styles.toolActive)}
-                  onClick={() => home.setCoffeeSize(option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            <div className={styles.toolGroup}>
-              <span className={styles.toolLabel}>Помол</span>
-              {GRIND_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={cx(styles.tool, home.grind === option.value && styles.toolActive)}
-                  onClick={() => home.setGrind(option.value)}
-                  title={option.hint}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className={styles.cards}>
-            {home.featured.map((product, index) => {
-              const isCoffee = product.category === 'coffee'
-              const variant = isCoffee ? home.coffeeSize : '1'
-
-              return (
-                <Reveal key={product.id} delay={index * 80}>
-                  <ProductCard
-                    product={product}
-                    variant={variant}
-                    grindLabel={isCoffee ? GRIND_LABELS[home.grind] : undefined}
-                    per100={isCoffee ? pricePer100(product, variant) : null}
-                    onAdd={() => home.addToCart(product)}
-                  />
-                </Reveal>
-              )
-            })}
+            {home.featured.map((product, index) => (
+              <Reveal key={product.id} delay={index * 80}>
+                <ProductCard product={product} variant="1" />
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
@@ -170,63 +119,22 @@ export const HomePage = observer(function HomePage() {
 
       <section className={ui.section}>
         <div className={cx(ui.container, styles.process)}>
-          <div>
-            <SectionHeading
-              kicker="Процесс"
-              title="Как проходит ремонт"
-              lead="Четыре шага, после которых машина снова варит, а не шипит. Диагностика бесплатна, если ремонт делаем мы."
-            />
-            <ol className={styles.steps}>
-              {home.steps.map((step, index) => (
-                <li key={step.title} className={styles.step}>
-                  <span className={styles.stepNumber}>{String(index + 1).padStart(2, '0')}</span>
-                  <div>
-                    <h3 className={styles.stepTitle}>{step.title}</h3>
-                    <p className={ui.muted}>{step.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          <Reveal>
-            <div className={cx(ui.card, styles.brew)}>
-              <h3 className={styles.brewTitle}>Рецепт под способ заваривания</h3>
-              <div className={styles.brewTabs}>
-                {home.brews.map((brew) => (
-                  <button
-                    key={brew.id}
-                    type="button"
-                    className={cx(
-                      styles.brewTab,
-                      home.activeBrewId === brew.id && styles.brewTabActive,
-                    )}
-                    onClick={() => home.setBrew(brew.id)}
-                  >
-                    {brew.label}
-                  </button>
-                ))}
-              </div>
-              <dl className={styles.brewGrid} key={home.activeBrewId}>
+          <SectionHeading
+            kicker="Процесс"
+            title="Как проходит ремонт"
+            lead="Четыре шага, после которых машина снова варит, а не шипит. Диагностика бесплатна, если ремонт делаем мы."
+          />
+          <ol className={styles.steps}>
+            {home.steps.map((step, index) => (
+              <li key={step.title} className={styles.step}>
+                <span className={styles.stepNumber}>{String(index + 1).padStart(2, '0')}</span>
                 <div>
-                  <dt>Пропорция</dt>
-                  <dd>{home.activeBrew.ratio}</dd>
+                  <h3 className={styles.stepTitle}>{step.title}</h3>
+                  <p className={ui.muted}>{step.text}</p>
                 </div>
-                <div>
-                  <dt>Время</dt>
-                  <dd>{home.activeBrew.time}</dd>
-                </div>
-                <div>
-                  <dt>Температура</dt>
-                  <dd>{home.activeBrew.temp}</dd>
-                </div>
-              </dl>
-              <p className={ui.muted}>
-                Начните с этих значений, потом двигайте помол: быстрее 2:30 — крупнее, дольше 3:10 —
-                мельче.
-              </p>
-            </div>
-          </Reveal>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
@@ -235,7 +143,11 @@ export const HomePage = observer(function HomePage() {
           {home.stats.map((stat) => (
             <div key={stat.label} className={styles.stat}>
               <span className={styles.statValue}>
-                <StatValue value={stat.value} suffix={stat.suffix} />
+                <StatValue
+                  value={stat.value}
+                  suffix={stat.suffix}
+                  suffixClassName={styles.statSuffix}
+                />
               </span>
               <span className={styles.statLabel}>{stat.label}</span>
             </div>
