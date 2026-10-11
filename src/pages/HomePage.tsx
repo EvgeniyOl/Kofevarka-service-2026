@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
-import { CupArt } from '../components/CupArt'
+import { ForgeArt } from '../components/ForgeArt'
 import { ProductCard } from '../components/ProductCard'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
@@ -70,7 +70,7 @@ export const HomePage = observer(function HomePage() {
           </div>
 
           <div className={styles.heroArt}>
-            <CupArt scene={['#4a2c1c', '#a35a30']} variant="hero" />
+            <ForgeArt variant="hero" />
             <span className={cx(styles.floatCard, styles.floatTop)}>
               <b>Диагностика</b> за один день
             </span>
