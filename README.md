@@ -78,10 +78,10 @@ Kofevarka/
    ├─ index.css             # глобально: сброс, токены, keyframes
    ├─ app/
    │  ├─ router.tsx         # маршруты приложения
-   │  ├─ Layout.tsx         # шапка, содержимое, подвал, title вкладки
+   │  ├─ Layout.tsx         # шапка, содержимое раздела, title вкладки
    │  └─ routes.ts          # справочник путей и подписей
-   ├─ components/           # Header, Footer, ProductCard, CupArt, Reveal, …
-   ├─ data/products.ts      # каталог: лоты, объёмы, помолы, цены
+   ├─ components/           # Header, ProductCard, CupArt, Reveal, Logo, …
+   ├─ data/products.ts      # каталог: техника, кофе, расходники — цены и варианты
    ├─ pages/                # по паре .tsx + .module.css на раздел
    ├─ stores/               # по стору на раздел + CartStore + RootStore
    ├─ styles/ui.module.css  # общие примитивы (кнопки, карточки, сетки)

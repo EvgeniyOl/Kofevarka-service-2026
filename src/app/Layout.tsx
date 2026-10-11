@@ -1,11 +1,10 @@
 import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router'
-import { Footer } from '../components/Footer'
 import { Header } from '../components/Header'
 import { ROUTES } from './routes'
 
 /**
- * Каркас приложения: шапка, содержимое раздела, подвал.
+ * Каркас приложения: шапка и содержимое раздела.
  * Здесь же — прокрутка наверх и заголовок вкладки при смене маршрута.
  */
 export function Layout() {
@@ -26,7 +25,6 @@ export function Layout() {
       <main>
         <Outlet />
       </main>
-      <Footer />
     </>
   )
 }

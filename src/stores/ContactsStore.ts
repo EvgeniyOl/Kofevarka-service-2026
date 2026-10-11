@@ -63,8 +63,6 @@ export class ContactsStore {
     message: false,
   }
   submitted = false
-  newsletterEmail = ''
-  newsletterDone = false
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true })
@@ -111,22 +109,6 @@ export class ContactsStore {
     this.submitted = true
     this.form = { name: '', email: '', message: '' }
     this.touched = { name: false, email: false, message: false }
-    return true
-  }
-
-  setNewsletterEmail(value: string): void {
-    this.newsletterEmail = value
-    this.newsletterDone = false
-  }
-
-  get newsletterValid(): boolean {
-    return EMAIL_RE.test(this.newsletterEmail.trim())
-  }
-
-  subscribeNewsletter(): boolean {
-    if (!this.newsletterValid) return false
-    this.newsletterDone = true
-    this.newsletterEmail = ''
     return true
   }
 }
