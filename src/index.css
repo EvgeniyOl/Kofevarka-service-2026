@@ -124,15 +124,6 @@ svg {
   }
 }
 
-@keyframes marqueeSlide {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 @keyframes riseIn {
   from {
     opacity: 0;

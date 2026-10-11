@@ -81,17 +81,6 @@ export const HomePage = observer(function HomePage() {
         </div>
       </section>
 
-      <div className={styles.marquee} aria-hidden="true">
-        <div className={styles.marqueeTrack}>
-          {[...home.marquee, ...home.marquee].map((item, index) => (
-            <span key={`${item}-${index}`} className={styles.marqueeItem}>
-              {item}
-              <i />
-            </span>
-          ))}
-        </div>
-      </div>
-
       <section className={ui.section}>
         <div className={ui.container}>
           <div className={styles.featuredHead}>
