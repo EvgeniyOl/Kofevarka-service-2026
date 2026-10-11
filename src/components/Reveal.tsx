@@ -24,6 +24,14 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
     const node = ref.current
     if (!node || typeof IntersectionObserver === 'undefined') return
 
+    /*
+     * Порог 0.12 годится для широких экранов, но на телефоне блок бывает выше
+     * области просмотра — тогда 12 % его площади в кадр не попадает никогда,
+     * и содержимое остаётся невидимым, занимая место пустотой. Поэтому
+     * на узком экране показываем блок, как только он задел край окна.
+     */
+    const narrow = window.matchMedia('(max-width: 768px)').matches
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
@@ -31,7 +39,7 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
           observer.disconnect()
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' },
+      narrow ? { threshold: 0 } : { threshold: 0.12, rootMargin: '0px 0px -60px 0px' },
     )
 
     observer.observe(node)

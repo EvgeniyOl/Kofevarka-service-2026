@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { cx } from '../utils/cx'
 import styles from './Logo.module.css'
 
@@ -13,10 +14,12 @@ interface LogoProps {
  * Знак Kofevarka Service: круглый металлический штамп с надписями
  * «КОФЕВАРКА» и «СЕРВИС».
  *
- * Раньше знак рисовался SVG — так он оставался чётким на печати, но не
- * совпадал с фирменным логотипом заказчика. Теперь используется готовая
- * картинка: public/logo.png — обрезанная по кругу фотография знака
- * с прозрачным фоном, 480 × 480. Анимации появления и наведения — в CSS.
+ * Размер задаём переменной `--logo-size`, а не инлайновыми width/height:
+ * так медиазапросы в стилях могут уменьшить знак на узком экране —
+ * инлайновый стиль перебить нельзя.
+ *
+ * Картинка — public/logo.png: обрезанная по кругу фотография знака
+ * с прозрачным фоном. Анимации появления и наведения — в CSS.
  */
 export function Logo({ size = 88, label = 'Kofevarka Service', className }: LogoProps) {
   return (
@@ -26,7 +29,7 @@ export function Logo({ size = 88, label = 'Kofevarka Service', className }: Logo
       alt={label}
       width={size}
       height={size}
-      style={{ width: size, height: size }}
+      style={{ '--logo-size': `${size}px` } as CSSProperties}
       decoding="async"
     />
   )

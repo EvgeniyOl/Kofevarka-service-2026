@@ -89,10 +89,26 @@
   display: inline-flex;
   flex-wrap: wrap;
   gap: 6px;
+  max-width: 100%;
   padding: 6px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(19, 16, 13, 0.5);
+}
+
+/* На телефоне переключатель выстраиваем в столбик: в строку подписи не влезают */
+@media (max-width: 620px) {
+  .segmented {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    border-radius: var(--radius);
+  }
+
+  .segment {
+    text-align: left;
+  }
 }
 
 .segment {

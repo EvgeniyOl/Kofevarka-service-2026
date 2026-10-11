@@ -10,6 +10,42 @@
   margin-bottom: 32px;
 }
 
+/*
+ * Кнопка «Показать фильтры» нужна только на телефоне: на широком экране
+ * все фильтры видны сразу, сворачивать нечего.
+ */
+.filtersToggle {
+  display: none;
+  align-self: flex-start;
+  padding: 10px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cream);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 18px 16px;
+    gap: 16px;
+  }
+
+  .filtersToggle {
+    display: block;
+  }
+
+  /* Свёрнутые фильтры не занимают места, раскрытые — обычный блок */
+  .filters {
+    display: none;
+  }
+
+  .filtersOpen {
+    display: block;
+  }
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;

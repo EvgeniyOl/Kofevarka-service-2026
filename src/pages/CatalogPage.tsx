@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { ProductCard } from '../components/ProductCard'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
@@ -35,6 +36,8 @@ const GRIND_LABELS: Record<string, string> = Object.fromEntries(
  */
 export const CatalogPage = observer(function CatalogPage() {
   const { catalog } = useStore()
+  /** Открыты ли фильтры: на телефоне их прячем, чтобы не занимали пол-экрана */
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   return (
     <section className={cx(ui.container, styles.page)}>
@@ -75,88 +78,106 @@ export const CatalogPage = observer(function CatalogPage() {
           </label>
         </div>
 
-        <div className={styles.row}>
-          <div className={styles.group}>
-            <span className={styles.label}>Раздел</span>
-            <div className={styles.chips}>
-              {CATEGORY_FILTERS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={cx(
-                    styles.chip,
-                    catalog.category === option.value && styles.chipActive,
-                  )}
-                  onClick={() => catalog.setCategory(option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/*
+          На телефоне фильтры свёрнуты: иначе панель занимает больше экрана,
+          чем список товаров. Кнопка видна только на узком экране.
+        */}
+        <button
+          type="button"
+          className={styles.filtersToggle}
+          onClick={() => setFiltersOpen((open) => !open)}
+          aria-expanded={filtersOpen}
+        >
+          {filtersOpen ? 'Скрыть фильтры' : 'Показать фильтры'}
+        </button>
 
-          {catalog.coffeeFiltersAvailable ? (
+        <div className={cx(styles.filters, filtersOpen && styles.filtersOpen)}>
+          <div className={styles.row}>
             <div className={styles.group}>
-              <span className={styles.label}>Обжарка</span>
+              <span className={styles.label}>Раздел</span>
               <div className={styles.chips}>
-                {ROAST_FILTERS.map((option) => (
+                {CATEGORY_FILTERS.map((option) => (
                   <button
-                    key={String(option.value)}
+                    key={option.value}
                     type="button"
-                    className={cx(styles.chip, catalog.roast === option.value && styles.chipActive)}
-                    onClick={() => catalog.setRoast(option.value)}
+                    className={cx(
+                      styles.chip,
+                      catalog.category === option.value && styles.chipActive,
+                    )}
+                    onClick={() => catalog.setCategory(option.value)}
                   >
                     {option.label}
                   </button>
                 ))}
               </div>
             </div>
-          ) : null}
 
-          <div className={styles.group}>
-            <span className={styles.label}>Объём кофе</span>
-            <div className={styles.chips}>
-              {VARIANT_OPTIONS.coffee.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={cx(
-                    styles.chip,
-                    catalog.coffeeSize === option.value && styles.chipActive,
-                  )}
-                  onClick={() => catalog.setCoffeeSize(option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
+            {catalog.coffeeFiltersAvailable ? (
+              <div className={styles.group}>
+                <span className={styles.label}>Обжарка</span>
+                <div className={styles.chips}>
+                  {ROAST_FILTERS.map((option) => (
+                    <button
+                      key={String(option.value)}
+                      type="button"
+                      className={cx(
+                        styles.chip,
+                        catalog.roast === option.value && styles.chipActive,
+                      )}
+                      onClick={() => catalog.setRoast(option.value)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <div className={styles.group}>
+              <span className={styles.label}>Объём кофе</span>
+              <div className={styles.chips}>
+                {VARIANT_OPTIONS.coffee.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={cx(
+                      styles.chip,
+                      catalog.coffeeSize === option.value && styles.chipActive,
+                    )}
+                    onClick={() => catalog.setCoffeeSize(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className={styles.group}>
-            <span className={styles.label}>Помол</span>
-            <div className={styles.chips}>
-              {GRIND_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={cx(styles.chip, catalog.grind === option.value && styles.chipActive)}
-                  onClick={() => catalog.setGrind(option.value)}
-                  title={option.hint}
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className={styles.group}>
+              <span className={styles.label}>Помол</span>
+              <div className={styles.chips}>
+                {GRIND_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={cx(styles.chip, catalog.grind === option.value && styles.chipActive)}
+                    onClick={() => catalog.setGrind(option.value)}
+                    title={option.hint}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <label className={styles.toggle}>
-            <input
-              type="checkbox"
-              checked={catalog.decafOnly}
-              onChange={() => catalog.toggleDecaf()}
-            />
-            <span>Только без кофеина</span>
-          </label>
+            <label className={styles.toggle}>
+              <input
+                type="checkbox"
+                checked={catalog.decafOnly}
+                onChange={() => catalog.toggleDecaf()}
+              />
+              <span>Только без кофеина</span>
+            </label>
+          </div>
         </div>
 
         <div className={styles.summary}>

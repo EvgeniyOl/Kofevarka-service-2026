@@ -15,6 +15,35 @@
   padding: 56px 0;
 }
 
+/*
+ * Телефон: секции сжимаем. При отступе 96 px сверху и снизу между блоками
+ * получалось почти 200 px пустоты — на маленьком экране это выглядит как
+ * разрыв, а не как воздух.
+ */
+@media (max-width: 768px) {
+  .container {
+    width: min(1200px, 100% - 32px);
+  }
+
+  .section {
+    padding: 56px 0;
+  }
+
+  .sectionTight {
+    padding: 40px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 44px 0;
+  }
+
+  .sectionTight {
+    padding: 32px 0;
+  }
+}
+
 .eyebrow {
   display: inline-flex;
   align-items: center;

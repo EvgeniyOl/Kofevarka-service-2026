@@ -1,5 +1,7 @@
 .logo {
   display: block;
+  width: var(--logo-size, 88px);
+  height: var(--logo-size, 88px);
   border-radius: 50%;
   /* Кромка знака светится при наведении — как металл под лампой */
   transition:
