@@ -4,6 +4,7 @@ import { CatalogStore } from './CatalogStore'
 import { ContactsStore } from './ContactsStore'
 import { DeliveryStore } from './DeliveryStore'
 import { HomeStore } from './HomeStore'
+import { RepairStore } from './RepairStore'
 import { SubscriptionStore } from './SubscriptionStore'
 
 /**
@@ -13,6 +14,7 @@ import { SubscriptionStore } from './SubscriptionStore'
 export class RootStore {
   readonly cart: CartStore
   readonly home: HomeStore
+  readonly repair: RepairStore
   readonly catalog: CatalogStore
   readonly subscription: SubscriptionStore
   readonly about: AboutStore
@@ -22,6 +24,7 @@ export class RootStore {
   constructor() {
     this.cart = new CartStore()
     this.home = new HomeStore(this.cart)
+    this.repair = new RepairStore()
     this.catalog = new CatalogStore(this.cart)
     this.subscription = new SubscriptionStore(this.cart)
     this.about = new AboutStore()

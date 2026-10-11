@@ -115,6 +115,13 @@
   color: var(--muted);
 }
 
+/* Гарантия, совместимость и объём — служебная строка под описанием */
+.metaLine {
+  font-size: 0.82rem;
+  color: var(--muted);
+  opacity: 0.85;
+}
+
 .footer {
   display: flex;
   align-items: flex-end;

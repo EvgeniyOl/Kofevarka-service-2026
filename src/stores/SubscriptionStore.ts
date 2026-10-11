@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import { findProduct, priceFor, type Grind, type Size } from '../data/products'
+import { findProduct, priceFor, productsByCategory, type Grind } from '../data/products'
 import type { CartStore } from './CartStore'
 
 export type PlanKind = 'solo' | 'duo' | 'office'
@@ -49,9 +49,10 @@ export class SubscriptionStore {
 
   plan: PlanKind = 'solo'
   frequency: FrequencyWeeks = 2
-  size: Size = 250
+  /** Объём кофе в подписке: «250», «500» или «1000» */
+  size = '250'
   grind: Grind = 'beans'
-  productId = 'signature-blend'
+  productId = 'espresso-blend'
   email = ''
   subscribed = false
   emailError: string | null = null
@@ -71,6 +72,11 @@ export class SubscriptionStore {
 
   get product() {
     return findProduct(this.productId)
+  }
+
+  /** Кофе для подписки: только категория «кофе», техника в подписку не идёт */
+  get coffeeOptions() {
+    return productsByCategory('coffee')
   }
 
   /** Цена одной доставки с учётом скидки подписки */
@@ -128,7 +134,7 @@ export class SubscriptionStore {
     this.frequency = value
   }
 
-  setSize(value: Size): void {
+  setSize(value: string): void {
     this.size = value
   }
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
-import { GRIND_OPTIONS, PRODUCTS, SIZE_OPTIONS, formatPrice } from '../data/products'
+import { GRIND_OPTIONS, PRODUCTS, VARIANT_OPTIONS, formatPrice } from '../data/products'
 import { FREQUENCIES } from '../stores/SubscriptionStore'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
@@ -19,7 +19,7 @@ export const SubscriptionPage = observer(function SubscriptionPage() {
       <SectionHeading
         kicker="Подписка"
         title="Кофе приезжает сам, пока вы про него не вспомнили"
-        lead="Скидка от 10 до 20 % к цене витрины, пауза и отмена в один клик. Первая доставка уходит в ближайший день обжарки."
+        lead="Скидка от 10 до 20 % к цене витрины, пауза и отмена в один клик. Зерно берём у обжарщиков, у которых пробовали каждую партию, и отправляем в день поступления."
       />
 
       <div className={styles.layout}>
@@ -75,7 +75,7 @@ export const SubscriptionPage = observer(function SubscriptionPage() {
               <h3 className={styles.blockTitle}>3. Кофе и помол</h3>
               <div className={styles.grid2}>
                 <label className={styles.field}>
-                  <span className={styles.label}>Лот</span>
+                  <span className={styles.label}>Кофе</span>
                   <select
                     className={ui.input}
                     value={subscription.productId}
@@ -94,11 +94,9 @@ export const SubscriptionPage = observer(function SubscriptionPage() {
                   <select
                     className={ui.input}
                     value={subscription.size}
-                    onChange={(event) =>
-                      subscription.setSize(Number(event.target.value) as 250 | 500 | 1000)
-                    }
+                    onChange={(event) => subscription.setSize(event.target.value)}
                   >
-                    {SIZE_OPTIONS.map((option) => (
+                    {VARIANT_OPTIONS.coffee.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -137,7 +135,7 @@ export const SubscriptionPage = observer(function SubscriptionPage() {
                 <dd>{subscription.currentPlan.title}</dd>
               </div>
               <div>
-                <dt>Лот</dt>
+                <dt>Кофе</dt>
                 <dd>{subscription.product?.name ?? '—'}</dd>
               </div>
               <div>

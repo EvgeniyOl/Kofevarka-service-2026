@@ -1,13 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import {
-  BADGE_LABELS,
-  ROAST_LABELS,
-  formatPrice,
-  priceFor,
-  pricePer100,
-  type Product,
-  type Size,
-} from '../data/products'
+import { BADGE_LABELS, formatPrice, priceFor, type Product } from '../data/products'
 import { CupArt } from './CupArt'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
@@ -15,7 +7,12 @@ import styles from './ProductCard.module.css'
 
 interface ProductCardProps {
   product: Product
-  size: Size
+  /** Выбранный вариант: объём кофе или «1 шт» для техники */
+  variant: string
+  /** Помол — только для кофе */
+  grindLabel?: string
+  /** Цена за 100 г — только для кофе */
+  per100?: number | null
   onAdd: () => void
   className?: string
 }
@@ -23,11 +20,21 @@ interface ProductCardProps {
 const ROAST_SCALE = [1, 2, 3, 4, 5] as const
 
 /**
- * Карточка товара. Компонент презентационный: объём, помол и корзину
+ * Карточка товара. Компонент презентационный: вариант, помол и корзину
  * передаёт страница, поэтому карточку используют и главная, и витрина.
+ * Что показывать в теле — зависит от категории: у кофе это обжарка и
+ * вкусовые ноты, у техники характеристики и гарантия, у расходников
+ * совместимость и объём.
  * Подтверждение «в корзине» — локальный отклик кнопки, а не данные приложения.
  */
-export function ProductCard({ product, size, onAdd, className }: ProductCardProps) {
+export function ProductCard({
+  product,
+  variant,
+  grindLabel,
+  per100,
+  onAdd,
+  className,
+}: ProductCardProps) {
   const [justAdded, setJustAdded] = useState(false)
   const timer = useRef<number | null>(null)
 
@@ -56,39 +63,62 @@ export function ProductCard({ product, size, onAdd, className }: ProductCardProp
         <header className={styles.head}>
           <h3 className={styles.name}>{product.name}</h3>
           <p className={styles.origin}>
-            {product.country} · {product.region}
+            {product.kind} · {product.subtitle}
           </p>
         </header>
 
-        <div className={styles.roast} title={`Обжарка: ${ROAST_LABELS[product.roast]}`}>
-          <span className={styles.roastLabel}>обжарка</span>
-          <span className={styles.roastScale}>
-            {ROAST_SCALE.map((level) => (
-              <i
-                key={level}
-                className={cx(styles.roastDot, level <= product.roast && styles.roastOn)}
-              />
-            ))}
-          </span>
-          <span className={styles.roastText}>{ROAST_LABELS[product.roast]}</span>
-        </div>
+        {product.roast ? (
+          <div className={styles.roast} title={`Обжарка поставщика: ${product.roast}/5`}>
+            <span className={styles.roastLabel}>обжарка</span>
+            <span className={styles.roastScale}>
+              {ROAST_SCALE.map((level) => (
+                <i
+                  key={level}
+                  className={cx(styles.roastDot, level <= product.roast! && styles.roastOn)}
+                />
+              ))}
+            </span>
+            {grindLabel ? <span className={styles.roastText}>{grindLabel}</span> : null}
+          </div>
+        ) : null}
 
-        <ul className={styles.notes}>
-          {product.notes.map((note) => (
-            <li key={note} className={ui.chip}>
-              {note}
-            </li>
-          ))}
-        </ul>
+        {product.notes?.length ? (
+          <ul className={styles.notes}>
+            {product.notes.map((note) => (
+              <li key={note} className={ui.chip}>
+                {note}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        {product.specs?.length ? (
+          <ul className={styles.notes}>
+            {product.specs.map((spec) => (
+              <li key={spec} className={ui.chip}>
+                {spec}
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
         <p className={styles.text}>{product.description}</p>
 
+        {product.warranty ? (
+          <p className={styles.metaLine}>Гарантия {product.warranty} мес · сервис в Омске</p>
+        ) : null}
+
+        {product.compatibleWith?.length ? (
+          <p className={styles.metaLine}>
+            Подходит: {product.compatibleWith.join(', ')}
+            {product.volume ? ` · ${product.volume}` : ''}
+          </p>
+        ) : null}
+
         <footer className={styles.footer}>
           <div className={styles.prices}>
-            <span className={ui.price}>{formatPrice(priceFor(product, size))}</span>
-            <span className={styles.per100}>
-              {formatPrice(pricePer100(product, size))} за 100 г
-            </span>
+            <span className={ui.price}>{formatPrice(priceFor(product, variant))}</span>
+            {per100 ? <span className={styles.per100}>{formatPrice(per100)} за 100 г</span> : null}
           </div>
           <button
             type="button"

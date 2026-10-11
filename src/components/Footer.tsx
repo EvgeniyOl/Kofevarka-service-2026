@@ -21,8 +21,8 @@ export const Footer = observer(function Footer() {
           </Link>
 
           <p className={ui.muted}>
-            Мастерская обжарки полного цикла: покупаем зеленое зерно напрямую, жарим дважды в неделю
-            и отправляем в день обжарки.
+            Мастерская ремонта кофемашин и магазин кофе: диагностика за день, оригинальные запчасти
+            и гарантия на работы. Плюс зерно обжарщиков и расходники для ухода.
           </p>
 
           <form
@@ -37,7 +37,7 @@ export const Footer = observer(function Footer() {
               type="email"
               value={contacts.newsletterEmail}
               onChange={(event) => contacts.setNewsletterEmail(event.target.value)}
-              placeholder="почта для писем о новых лотах"
+              placeholder="почта для писем о новых поступлениях"
               aria-label="Почта для подписки"
             />
             <button className={ui.btn} type="submit">

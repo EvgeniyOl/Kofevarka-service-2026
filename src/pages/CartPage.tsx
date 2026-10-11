@@ -4,14 +4,11 @@ import { ROUTES } from '../app/routes'
 import { CupArt } from '../components/CupArt'
 import { QuantityStepper } from '../components/QuantityStepper'
 import { SectionHeading } from '../components/SectionHeading'
-import { GRIND_OPTIONS, formatPrice } from '../data/products'
+import { formatPrice } from '../data/products'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './CartPage.module.css'
-
-const grindLabel = (grind: string): string =>
-  GRIND_OPTIONS.find((option) => option.value === grind)?.label ?? grind
 
 /** Корзина: строки заказа, промокод, прогресс до бесплатной доставки и итог */
 export const CartPage = observer(function CartPage() {
@@ -24,7 +21,8 @@ export const CartPage = observer(function CartPage() {
         <div className={cx(ui.card, styles.empty)}>
           <CupArt scene={['#3a2a1d', '#6b4a30']} variant="empty" />
           <p className={ui.lead}>
-            Загляните в витрину: восемь лотов, цена за 100 грамм рядом с ценой за пакет.
+            Загляните в витрину: кофемашины и кофемолки с гарантией, зерно обжарщиков и расходники
+            для ухода. Для кофе рядом с ценой всегда цена за 100 грамм.
           </p>
           <div className={styles.emptyActions}>
             <Link className={ui.btn} to={ROUTES.catalog.path}>
@@ -44,7 +42,7 @@ export const CartPage = observer(function CartPage() {
       <SectionHeading
         kicker="Корзина"
         title={`${cart.count} позиц. на ${formatPrice(cart.subtotal)}`}
-        lead="Проверьте объём и помол: от этого зависит рецепт, который придёт вместе с заказом."
+        lead="Проверьте объём и помол для кофе: от этого зависит рецепт, который придёт вместе с заказом. Технику привезём с гарантией и настроим на месте."
       />
 
       <div className={styles.layout}>
@@ -58,13 +56,15 @@ export const CartPage = observer(function CartPage() {
               <div className={styles.lineBody}>
                 <div className={styles.lineHead}>
                   <h3 className={styles.lineName}>{line.name}</h3>
-                  <span className={ui.muted}>{line.country}</span>
+                  <span className={ui.muted}>{line.subtitle}</span>
                 </div>
 
                 <div className={styles.lineMeta}>
-                  <span className={ui.chip}>{line.size} г</span>
-                  <span className={ui.chip}>{grindLabel(line.grind)}</span>
-                  <span className={ui.chip}>{formatPrice(line.unitPrice)} за пакет</span>
+                  <span className={ui.chip}>{line.variantLabel}</span>
+                  {cart.grindLabel(line) ? (
+                    <span className={ui.chip}>{cart.grindLabel(line)}</span>
+                  ) : null}
+                  <span className={ui.chip}>{formatPrice(line.unitPrice)} за позицию</span>
                 </div>
 
                 <div className={styles.lineActions}>

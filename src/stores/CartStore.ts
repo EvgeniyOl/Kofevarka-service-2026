@@ -1,15 +1,18 @@
 import { makeAutoObservable } from 'mobx'
-import { findProduct, priceFor, type Grind, type Size } from '../data/products'
+import { findProduct, priceFor, type Category, type Grind } from '../data/products'
 
-/** Строка корзины: один товар в конкретном объёме и помоле */
+/** Строка корзины: один товар в выбранном варианте; у кофе ещё и в помоле */
 export interface CartLine {
   /** Ключ строки: одинаковый кофе в разном помоле — разные строки */
   id: string
   productId: string
   name: string
-  country: string
-  size: Size
-  grind: Grind
+  subtitle: string
+  category: Category
+  /** Метка варианта: «250 г» для кофе или «1 шт» для техники */
+  variantLabel: string
+  /** Помол — только для кофе */
+  grind?: Grind
   quantity: number
   unitPrice: number
 }
@@ -17,6 +20,14 @@ export interface CartLine {
 const PROMO_CODES: Record<string, number> = {
   KOFE10: 0.1,
   GASTRO15: 0.15,
+}
+
+/** Подпись помола в строке заказа */
+const GRIND_LABELS: Record<Grind, string> = {
+  beans: 'в зёрнах',
+  espresso: 'эспрессо',
+  filter: 'фильтр',
+  french: 'френч-пресс',
 }
 
 /** Корзина — общий стор: её читает и шапка, и страница заказа */
@@ -76,11 +87,17 @@ export class CartStore {
     return Math.min(100, Math.round((this.payable / this.freeShippingFrom) * 100))
   }
 
-  add(productId: string, size: Size, grind: Grind, quantity = 1): void {
+  /**
+   * Добавить товар. Помол передаём только для кофе — у техники и расходников
+   * его нет, и в ключе строки он не участвует.
+   */
+  add(productId: string, variant: string, grind?: Grind, quantity = 1): void {
     const product = findProduct(productId)
     if (!product) return
 
-    const id = `${productId}:${size}:${grind}`
+    const variantLabel = product.category === 'coffee' ? `${variant} г` : `${variant} шт`
+    const lineGrind = product.category === 'coffee' ? (grind ?? 'beans') : undefined
+    const id = lineGrind ? `${productId}:${variant}:${lineGrind}` : `${productId}:${variant}`
     const existing = this.lines.find((line) => line.id === id)
 
     if (existing) {
@@ -92,12 +109,18 @@ export class CartStore {
       id,
       productId,
       name: product.name,
-      country: product.country,
-      size,
-      grind,
+      subtitle: product.subtitle,
+      category: product.category,
+      variantLabel,
+      grind: lineGrind,
       quantity,
-      unitPrice: priceFor(product, size),
+      unitPrice: priceFor(product, variant),
     })
+  }
+
+  /** Подпись помола для строки заказа */
+  grindLabel(line: CartLine): string | null {
+    return line.grind ? GRIND_LABELS[line.grind] : null
   }
 
   remove(lineId: string): void {

@@ -14,11 +14,7 @@ export const AboutPage = observer(function AboutPage() {
 
   return (
     <section className={cx(ui.container, styles.page)}>
-      <SectionHeading
-        kicker="О нас"
-        title="Мастерская обжарки, а не отдел маркетинга"
-        lead={about.intro}
-      />
+      <SectionHeading kicker="О нас" title="Мастерская, а не отдел маркетинга" lead={about.intro} />
 
       <div className={styles.numbers}>
         {about.numbers.map((item, index) => (
@@ -76,7 +72,7 @@ export const AboutPage = observer(function AboutPage() {
         </div>
 
         <div>
-          <h3 className={styles.blockTitle}>Кто жарит</h3>
+          <h3 className={styles.blockTitle}>Кто ремонтирует</h3>
           <div className={styles.team}>
             {about.team.map((member, index) => (
               <Reveal key={member.name} delay={index * 70}>
@@ -98,14 +94,14 @@ export const AboutPage = observer(function AboutPage() {
 
       <div className={cx(ui.card, styles.cta)}>
         <div>
-          <h3 className={cx(ui.title, styles.ctaTitle)}>Приходите на дегустацию в мастерскую</h3>
+          <h3 className={cx(ui.title, styles.ctaTitle)}>Привозите машину — посмотрим при вас</h3>
           <p className={ui.lead}>
-            По субботам в 12:00 разбираем четыре лота и три способа заваривания. Бесплатно, восемь
-            мест, нужна запись.
+            Мастерская на Декабристов, 116/1: диагностика за день, смета до работ и гарантия
+            полгода. Если ехать неудобно — вызовем мастера или заберём технику сами.
           </p>
         </div>
-        <Link className={ui.btn} to={ROUTES.contacts.path}>
-          Записаться
+        <Link className={ui.btn} to={ROUTES.repair.path}>
+          Что мы ремонтируем
         </Link>
       </div>
     </section>

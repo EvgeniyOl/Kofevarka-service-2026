@@ -17,14 +17,23 @@ export const ROUTES = {
   home: {
     path: '/',
     label: 'Главная',
-    title: 'Kofevarka Service — свежая обжарка с доставкой',
-    description: 'Обжариваем спешелти-кофе малыми партиями и отправляем в день обжарки.',
+    title: 'Kofevarka Service — ремонт кофемашин и кофе в Омске',
+    description:
+      'Ремонтируем бытовые и профессиональные кофемашины, продаём кофе, расходники и технику.',
+  },
+  repair: {
+    path: '/repair',
+    label: 'Ремонт',
+    title: 'Ремонт кофемашин — Kofevarka Service',
+    description:
+      'Диагностика за день, запчасти на складе, выезд мастера и гарантия 6 месяцев на работы.',
   },
   catalog: {
     path: '/catalog',
     label: 'Витрина',
-    title: 'Витрина кофе — Kofevarka Service',
-    description: 'Восемь лотов из Эфиопии, Кении, Колумбии и не только: фильтр, эспрессо, декоф.',
+    title: 'Витрина — кофемашины, кофе и расходники — Kofevarka Service',
+    description:
+      'Кофемашины и кофемолки с гарантией, зерно обжарщиков, фильтры и средства для ухода.',
   },
   subscription: {
     path: '/subscription',
@@ -36,7 +45,7 @@ export const ROUTES = {
     path: '/about',
     label: 'О нас',
     title: 'О нас — Kofevarka Service',
-    description: 'Небольшая обжарочная мастерская: как мы выбираем зерно и жарим.',
+    description: 'Мастерская на Декабристов: как мы ремонтируем кофемашины и что продаём.',
   },
   delivery: {
     path: '/delivery',
@@ -48,7 +57,7 @@ export const ROUTES = {
     path: '/contacts',
     label: 'Контакты',
     title: 'Контакты — Kofevarka Service',
-    description: 'Мастерская, телефон, почта и форма обратной связи.',
+    description: 'Мастерская, телефоны, почта и форма заявки на ремонт.',
   },
   cart: {
     path: '/cart',
@@ -63,6 +72,7 @@ export type RouteKey = keyof typeof ROUTES
 /** Разделы для меню — без корзины, она живёт отдельной кнопкой в шапке */
 export const NAV_ROUTES: RouteMeta[] = [
   ROUTES.home,
+  ROUTES.repair,
   ROUTES.catalog,
   ROUTES.subscription,
   ROUTES.about,
