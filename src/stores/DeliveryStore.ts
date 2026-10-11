@@ -1,14 +1,7 @@
 import { makeAutoObservable } from 'mobx'
+import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '../data/contacts'
 
-export type DeliveryMethod = 'courier' | 'pickup' | 'post'
-
-export interface DeliveryZone {
-  id: string
-  name: string
-  courierPrice: number
-  days: string
-  freeFrom: number
-}
+export type DeliveryMethod = 'courier' | 'pickup'
 
 export interface DeliveryMethodInfo {
   id: DeliveryMethod
@@ -22,124 +15,89 @@ export interface FaqEntry {
   answer: string
 }
 
-export const ZONES: DeliveryZone[] = [
-  { id: 'center', name: 'Центр', courierPrice: 290, days: 'в день заказа', freeFrom: 2500 },
-  { id: 'city', name: 'Остальной город', courierPrice: 390, days: '1 день', freeFrom: 3500 },
-  { id: 'region', name: 'Область', courierPrice: 590, days: '2–3 дня', freeFrom: 6000 },
-  { id: 'russia', name: 'Другие регионы', courierPrice: 890, days: '3–7 дней', freeFrom: 9000 },
-]
-
+/** Доставка только по Омску, поэтому способов два */
 export const METHODS: DeliveryMethodInfo[] = [
   {
     id: 'courier',
-    title: 'Курьер',
-    text: 'Привезём к двери, предупредим за час. Доставка по городу — каждый день, кроме воскресенья.',
-    priceNote: 'по тарифу зоны',
+    title: 'Курьер по Омску',
+    text: 'Привозим к двери по всему городу — от Чкаловска до Левобережья. Везём каждый день, кроме воскресенья, и предупреждаем за час.',
+    priceNote: 'бесплатно от 3 кг кофе',
   },
   {
     id: 'pickup',
-    title: 'Пункт выдачи',
-    text: 'Самовывоз из мастерской или 240 постаматов. Заказ ждёт 7 дней, хранение бесплатное.',
+    title: 'Самовывоз из мастерской',
+    text: 'Улица Декабристов, 116/1, первый этаж. Заказ ждёт 7 дней, хранение бесплатное. Здесь же можно сразу проверить технику на стенде.',
     priceNote: 'бесплатно',
-  },
-  {
-    id: 'post',
-    title: 'Почта и СДЭК',
-    text: 'Для других регионов: трек-номер приходит в письме, страховка посылки включена.',
-    priceNote: 'по тарифу перевозчика',
   },
 ]
 
-/** Стор раздела доставки: калькулятор стоимости и сроков плюс FAQ */
+/**
+ * Стор раздела доставки: условия доставки, подписка и FAQ.
+ * Заказ оформляем по телефону или заявкой — корзины и калькулятора на сайте нет,
+ * поэтому здесь только справочная информация.
+ */
 export class DeliveryStore {
-  zones = ZONES
   methods = METHODS
 
-  zoneId = 'center'
-  method: DeliveryMethod = 'courier'
-  /** Вес заказа в граммах — влияет только на почтовую отправку */
-  weight = 500
-  /** Сумма заказа, ₽ */
-  orderSum = 1800
+  /** Порог бесплатной доставки, граммы: 3 кг кофе */
+  readonly freeFrom = 3000
+  /** Цена курьера, если кофе меньше порога, ₽ */
+  readonly courierPrice = 290
+
+  readonly phone = CONTACT_PHONE
+  readonly phoneHref = CONTACT_PHONE_HREF
+
   openFaqIndex: number | null = 0
+
+  /** Подписка: 2 кг кофе в месяц — обслуживание машины бесплатно */
+  readonly subscription = {
+    coffeeKg: 2,
+    bagGrams: 250,
+    bags: 8,
+    discountPercent: 10,
+    serviceText: 'чистка и обслуживание кофемашины — бесплатно',
+  }
 
   readonly faq: FaqEntry[] = [
     {
-      question: 'Как быстро приедет заказ?',
+      question: 'Как оформить заказ?',
       answer:
-        'Кофе и расходники отправляем в день заказа, если оформили до 15:00. Технику перед отправкой проверяем на стенде: проливаем, настраиваем помол — это добавляет один рабочий день.',
+        'Онлайн-оплаты на сайте нет. Позвоните в мастерскую или оставьте заявку на странице контактов: подскажем наличие, соберём заказ и назовём срок. Для кофеен и офисов выставим счёт.',
     },
     {
-      question: 'Везёте ли кофемашины в другой город?',
+      question: 'Когда доставка бесплатная?',
       answer:
-        'Да, отправляем транспортными компаниями в жёсткой обрешётке и со страховкой. Трек-номер приходит в письме, а настройку после доставки подскажем по телефону.',
+        'Курьер по Омску бесплатный, если в заказе 3 кг кофе и больше. Если кофе меньше — доставка 290 ₽, а самовывоз из мастерской бесплатный всегда. Для кофеен и офисов считаем доставку по объёму: позвоните, договоримся.',
     },
     {
-      question: 'Что если посылка пришла повреждённой?',
+      question: 'Как быстро привезёте?',
       answer:
-        'Напишите в течение 3 дней и приложите фото. Заменим позицию или вернём деньги — пересылка за наш счёт. Технику дополнительно страхуем при отправке.',
+        'Кофе и расходники привозим в день заказа, если договорились до 15:00. Технику перед отправкой проверяем на стенде: проливаем, настраиваем помол — это добавляет один рабочий день.',
+    },
+    {
+      question: 'Как везёте кофемашины?',
+      answer:
+        'Технику доставляем по Омску отдельно: аппарат тяжёлый, его нужно поднять и поставить на месте. Стоимость зависит от района и этажа — скажем по телефону до заказа. При покупке машины у нас доставку и настройку делаем бесплатно.',
+    },
+    {
+      question: 'Что даёт подписка на 2 кг в месяц?',
+      answer:
+        'Каждый месяц привозим 2 кг кофе со скидкой 10 % и бесплатно обслуживаем кофемашину: чистка группы, промывка гидросистемы, проверка помола. Если кофе закончился раньше — довезём вне графика, доплачивать за доставку не нужно.',
+    },
+    {
+      question: 'Везёте ли в область и другие города?',
+      answer:
+        'Нет, доставку делаем только по Омску — так мы отвечаем за технику и кофе. Из области и других городов забирайте заказ в мастерской или закажите ремонт с выездом мастера по городу.',
     },
     {
       question: 'Можно ли забрать заказ самому?',
       answer:
         'Да, мастерская открыта пн–пт с 10:00 до 19:00 и в субботу с 10:00 до 17:00. Адрес — улица Декабристов, 116/1, 1 этаж; нужен только номер заказа.',
     },
-    {
-      question: 'Машину можно привезти к вам на ремонт?',
-      answer:
-        'Да, привозите в мастерскую в рабочие часы или закажите выезд мастера — по городу забираем и возвращаем технику сами. Диагностика занимает один день и бесплатна, если ремонт делаем мы.',
-    },
   ]
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true })
-  }
-
-  get zone(): DeliveryZone {
-    return this.zones.find((item) => item.id === this.zoneId) ?? this.zones[0]
-  }
-
-  get methodInfo(): DeliveryMethodInfo {
-    return this.methods.find((item) => item.id === this.method) ?? this.methods[0]
-  }
-
-  /** Итоговая стоимость доставки с учётом порога бесплатной доставки */
-  get cost(): number {
-    if (this.method === 'pickup') return 0
-    if (this.method === 'post') return 190 + Math.ceil(this.weight / 500) * 90
-    return this.orderSum >= this.zone.freeFrom ? 0 : this.zone.courierPrice
-  }
-
-  get eta(): string {
-    if (this.method === 'pickup') return 'сегодня, после 14:00'
-    if (this.method === 'post') return `${this.zone.id === 'russia' ? '3–7' : '2–3'} дня`
-    return this.zone.days
-  }
-
-  get isFree(): boolean {
-    return this.cost === 0
-  }
-
-  /** Сколько осталось добрать до бесплатной доставки в текущем сценарии */
-  get freeFromLeft(): number {
-    if (this.method !== 'courier') return 0
-    return Math.max(0, this.zone.freeFrom - this.orderSum)
-  }
-
-  setZone(id: string): void {
-    this.zoneId = id
-  }
-
-  setMethod(value: DeliveryMethod): void {
-    this.method = value
-  }
-
-  setWeight(value: number): void {
-    this.weight = Math.max(250, Math.min(5000, Math.round(value / 250) * 250))
-  }
-
-  setOrderSum(value: number): void {
-    this.orderSum = Math.max(0, Math.min(50000, Math.round(value / 100) * 100))
   }
 
   toggleFaq(index: number): void {
