@@ -3,10 +3,24 @@ import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
+import { EDITABLE_BLOCKS } from '../data/editableBlocks'
 import { useStore } from '../stores/context'
+import { BLOCK_KEYS } from '../stores/ContentStore'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './RepairPage.module.css'
+
+/**
+ * Тексты первого экрана лежат в справочнике редактируемых блоков:
+ * оттуда же их берёт форма в админке, поэтому подпись и значение
+ * не разъедутся. Здесь только находим нужные дефолты по ключу.
+ */
+const HERO = EDITABLE_BLOCKS.find((block) => block.key === BLOCK_KEYS.repairHero)?.defaults ?? {
+  title: '',
+  lead: '',
+  actionOne: '',
+  actionTwo: '',
+}
 
 /**
  * Ремонт кофемашин: направления работ, порядок действий, ориентиры по цене,
@@ -14,25 +28,23 @@ import styles from './RepairPage.module.css'
  * в контактах.
  */
 export const RepairPage = observer(function RepairPage() {
-  const { repair, contacts } = useStore()
+  const { repair, contacts, content } = useStore()
   const phone = contacts.channels.find((channel) => channel.href?.startsWith('tel:'))
+  const hero = content.block(BLOCK_KEYS.repairHero, HERO)
 
   return (
     <section className={cx(ui.container, styles.page)}>
-      <SectionHeading
-        kicker="Ремонт"
-        title="Починим кофемашину — от домашней до кофейной"
-        lead="Диагностика за один рабочий день, запчасти на складе, выезд мастера по Омску и гарантия 6 месяцев на работу. Ремонтируем любые марки, даже купленные не у нас."
-      />
+      <SectionHeading kicker="Ремонт" title={hero.title} lead={hero.lead} />
 
       <div className={styles.actions}>
         {phone ? (
           <a className={ui.btn} href={phone.href}>
-            Позвонить: {phone.value}
+            {/* Телефон подставляем из справочника: в админке меняется только надпись */}
+            {hero.actionOne}: {phone.value}
           </a>
         ) : null}
         <Link className={cx(ui.btn, ui.btnGhost)} to={ROUTES.contacts.path}>
-          Оставить заявку
+          {hero.actionTwo}
         </Link>
       </div>
 

@@ -5,9 +5,9 @@
  * credentials: 'include' обязателен: сессия лежит в httpOnly-cookie, и без
  * этого браузер не отправит её на другие страницы сайта.
  */
-import type { PublicUser, SiteRequest, RequestStatus } from '../../api/_lib/types'
+import type { PublicUser, SiteContent, SiteRequest, RequestStatus } from '../../api/_lib/types'
 
-export type { PublicUser, SiteRequest, RequestStatus }
+export type { PublicUser, SiteContent, SiteRequest, RequestStatus }
 
 /** Ошибка с текстом от сервера: показываем её прямо в форме */
 export class ApiError extends Error {
@@ -87,4 +87,19 @@ export const api = {
    * Смены роли здесь нет: администратор один и назначается при регистрации.
    */
   users: () => request<{ users: PublicUser[] }>('/users'),
+
+  /** Редактируемые тексты блоков: читают все, сохраняет только админ */
+  content: () => request<{ blocks: SiteContent[] }>('/content'),
+
+  saveContent: (data: {
+    key: string
+    title?: string
+    lead?: string
+    actionOne?: string
+    actionTwo?: string
+  }) =>
+    request<{ block: SiteContent | null }>('/content', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
 }

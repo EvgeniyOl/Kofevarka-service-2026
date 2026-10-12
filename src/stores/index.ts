@@ -1,6 +1,7 @@
 import { AboutStore } from './AboutStore'
 import { AuthStore } from './AuthStore'
 import { ContactsStore } from './ContactsStore'
+import { ContentStore } from './ContentStore'
 import { DeliveryStore } from './DeliveryStore'
 import { HomeStore } from './HomeStore'
 import { RepairStore } from './RepairStore'
@@ -19,6 +20,8 @@ export class RootStore {
   readonly delivery: DeliveryStore
   readonly contacts: ContactsStore
   readonly auth: AuthStore
+  /** Тексты блоков, которые правит админ */
+  readonly content: ContentStore
 
   constructor() {
     this.home = new HomeStore()
@@ -28,6 +31,7 @@ export class RootStore {
     this.delivery = new DeliveryStore()
     this.contacts = new ContactsStore()
     this.auth = new AuthStore()
+    this.content = new ContentStore()
   }
 }
 

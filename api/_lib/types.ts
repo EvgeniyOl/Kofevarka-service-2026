@@ -62,3 +62,37 @@ export const toSiteRequest = (row: SiteRequestRow): SiteRequest => ({
   status: row.status,
   createdAt: row.created_at,
 })
+
+/**
+ * Редактируемый блок сайта. Все поля, кроме ключа, могут быть пустыми:
+ * пустое значение означает «оставить текст из кода», поэтому админ
+ * может менять только заголовок, не трогая остальное.
+ */
+export interface SiteContentRow {
+  key: string
+  title: string | null
+  lead: string | null
+  action_one: string | null
+  action_two: string | null
+  updated_at: string
+}
+
+export interface SiteContent {
+  key: string
+  title?: string
+  lead?: string
+  actionOne?: string
+  actionTwo?: string
+  updatedAt: string
+}
+
+export const toSiteContent = (row: SiteContentRow): SiteContent => ({
+  key: row.key,
+  // null превращаем в undefined: так фронтенд отличает «не задано»
+  // от «задано пустой строкой»
+  title: row.title ?? undefined,
+  lead: row.lead ?? undefined,
+  actionOne: row.action_one ?? undefined,
+  actionTwo: row.action_two ?? undefined,
+  updatedAt: row.updated_at,
+})

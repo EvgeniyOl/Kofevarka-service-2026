@@ -18,6 +18,12 @@ if (!container) {
  */
 void rootStore.auth.load()
 
+/*
+ * Тексты блоков грузим тоже заранее: страницы читают их синхронно,
+ * иначе при первом кадре мелькали бы варианты из кода.
+ */
+void rootStore.content.load()
+
 createRoot(container).render(
   <StrictMode>
     <StoreProvider>

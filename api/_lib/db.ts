@@ -35,6 +35,22 @@ CREATE TABLE IF NOT EXISTS site_requests (
 );
 
 CREATE INDEX IF NOT EXISTS site_requests_created_at_idx ON site_requests (created_at DESC);
+
+/*
+ * Редактируемые тексты сайта. В таблице лежат только те блоки, которые админ
+ * менял: если строки нет, страница показывает текст из кода. Так правка одного
+ * заголовка не требует заводить записи для всего сайта.
+ * key — устойчивый идентификатор блока («repair.hero»), по нему страница
+ * находит свои тексты.
+ */
+CREATE TABLE IF NOT EXISTS site_content (
+  key        TEXT PRIMARY KEY,
+  title      TEXT,
+  lead       TEXT,
+  action_one TEXT,
+  action_two TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 `
 
 /** Адрес базы: Vercel и Neon кладут его в DATABASE_URL */
