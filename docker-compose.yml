@@ -1,0 +1,41 @@
+# База для разработки: обычный PostgreSQL в контейнере.
+#
+# Запуск:   docker compose up -d
+# Остановка: docker compose down          (данные сохранятся в томе)
+# Полная очистка с данными: docker compose down -v
+#
+# Этот же файл годится для сервера: на VPS достаточно поменять пароль
+# и не открывать порт наружу, если приложение живёт рядом.
+
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: kofevarka-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kofevarka
+      POSTGRES_PASSWORD: kofevarka
+      POSTGRES_DB: kofevarka
+      # Кириллица в данных: локаль и кодировку задаём явно
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=C'
+    ports:
+      # Снаружи 5433, потому что 5432 часто занят локальным Postgres.
+      # Внутри контейнера порт всегда 5432.
+      - '5433:5432'
+    volumes:
+      # Данные в именованном томе: переживают пересоздание контейнера.
+      #
+      # Монтируем в /var/lib/postgresql, а не в .../data: в образах PostgreSQL
+      # 18+ данные лежат в подпапке с номером версии, и старый путь ломает
+      # запуск — контейнер уходит в бесконечный перезапуск.
+      # Подробности: https://github.com/docker-library/postgres/pull/1259
+      - kofevarka-pgdata:/var/lib/postgresql
+    healthcheck:
+      # Приложение должно дождаться готовности базы, а не падать на старте
+      test: ['CMD-SHELL', 'pg_isready -U kofevarka -d kofevarka']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  kofevarka-pgdata:
