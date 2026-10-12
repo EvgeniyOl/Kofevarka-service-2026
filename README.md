@@ -401,8 +401,8 @@ Nespresso, Lavazza, Illy, Trade Coffee. Из живых примеров — 179
 (источники и лицензии — в `public/photos/CREDITS.md`).
 
 Анимации: появление блоков через `IntersectionObserver` (`Reveal`), набегающие цифры,
-пар над чашкой, hover-подъёмы карточек, искры в сцене кузнеца.
-Всё уважает системную настройку `prefers-reduced-motion`.
+пар над чашкой, hover-подъёмы карточек. Всё уважает системную настройку
+`prefers-reduced-motion`.
 
 ## Как работать с состоянием
 

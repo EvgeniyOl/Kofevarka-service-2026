@@ -71,95 +71,18 @@
   animation: riseIn 1.1s var(--ease) 0.15s both;
 }
 
-/* Жар горна: плашки то разгораются, то чуть остывают */
-@keyframes forgeHeat {
-  0%,
-  100% {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 214, 152, 0.28),
-      inset 0 0 20px rgba(220, 120, 40, 0.16),
-      0 14px 34px rgba(0, 0, 0, 0.5),
-      0 0 20px rgba(232, 140, 56, 0.24);
-  }
-
-  50% {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 224, 170, 0.42),
-      inset 0 0 28px rgba(230, 130, 44, 0.26),
-      0 14px 34px rgba(0, 0, 0, 0.5),
-      0 0 34px rgba(240, 152, 62, 0.42);
-  }
-}
-
 /*
- * Плашки поверх кадра кузнеца — в стиле раскалённого металла:
- * тёплый градиент от горна, светящаяся кромка, срезанный угол
- * и пульсирующий жар. Так они читаются как часть картинки, а не как
- * случайные подписи поверх фотографии.
+ * Кадр кофемашины за работой. Пропорции близки к исходным (3:2), но чуть
+ * выше: в сетке первого экрана колонка уже, и такая рамка смотрится ровнее.
  */
-.floatCard {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 11px 16px 12px;
-  border: 1px solid rgba(255, 176, 92, 0.5);
-  border-radius: var(--radius-sm);
-  /* Срезанный угол — как у кованой пластины */
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
-  background:
-    radial-gradient(130% 150% at 12% -20%, rgba(255, 186, 96, 0.34), transparent 62%),
-    linear-gradient(160deg, rgba(74, 40, 16, 0.94), rgba(18, 12, 9, 0.96));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 214, 152, 0.32),
-    inset 0 0 24px rgba(220, 120, 40, 0.2),
-    0 14px 34px rgba(0, 0, 0, 0.5),
-    0 0 26px rgba(232, 140, 56, 0.3);
-  font-size: 0.74rem;
-  letter-spacing: 0.01em;
-  color: rgba(238, 214, 186, 0.86);
-  animation: forgeHeat 4.2s ease-in-out infinite;
-}
-
-/* Светящийся уголок — как искра на кромке; стоит там же, где срез */
-.floatCard::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 16px;
-  height: 16px;
-  background: linear-gradient(225deg, rgba(255, 214, 150, 0.9), rgba(255, 150, 60, 0.15));
-  clip-path: polygon(0 0, 100% 100%, 0 100%);
-}
-
-.floatCard b {
-  font-family: var(--font-display);
-  font-size: 1.12rem;
-  font-weight: 400;
-  color: #ffd79a;
-  text-shadow: 0 1px 12px rgba(255, 150, 60, 0.55);
-}
-
-/* Плашки выносим за край кадра: так они не закрывают кузнеца и молот */
-.floatTop {
-  top: 16px;
-  left: -34px;
-}
-
-.floatBottom {
-  right: -30px;
-  bottom: 30px;
-  /* У нижней плашки срезаем угол слева, поэтому искра переезжает в правый низ */
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-  animation-delay: 1.4s;
-}
-
-.floatBottom::after {
-  top: auto;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(255, 150, 60, 0.15), rgba(255, 214, 150, 0.9));
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+.heroPhoto {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  object-position: 50% 50%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
 }
 
 .cards {
@@ -366,48 +289,12 @@
   }
 
   .heroArt {
-    /* На планшете и телефоне кадр уже окна, поэтому плашки держим внутри него */
-    max-width: min(460px, 100%);
-  }
-
-  .floatTop {
-    left: 0;
-  }
-
-  .floatBottom {
-    right: 0;
+    /* На планшете и телефоне кадр не растягиваем на всю ширину строки */
+    max-width: min(560px, 100%);
   }
 }
 
 @media (max-width: 640px) {
-  /* На узком экране плашки не выносим за кадр: иначе они обрезаются краем окна */
-  .floatCard {
-    padding: 8px 12px 9px;
-    font-size: 0.68rem;
-    max-width: 62%;
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-  }
-
-  .floatCard b {
-    font-size: 0.96rem;
-  }
-
-  .floatCard::after {
-    width: 12px;
-    height: 12px;
-  }
-
-  .floatTop {
-    top: 10px;
-    left: 0;
-  }
-
-  .floatBottom {
-    right: 0;
-    bottom: 18px;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-  }
-
   .cta {
     flex-direction: column;
     align-items: flex-start;

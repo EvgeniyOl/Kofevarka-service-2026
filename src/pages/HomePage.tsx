@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
-import { ForgeArt } from '../components/ForgeArt'
 import { ProductCard } from '../components/ProductCard'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
@@ -41,13 +40,12 @@ export const HomePage = observer(function HomePage() {
           </div>
 
           <div className={styles.heroArt}>
-            <ForgeArt variant="hero" photo="/photos/forge-dwarf.jpg" />
-            <span className={cx(styles.floatCard, styles.floatTop)}>
-              <b>Диагностика</b> за один день
-            </span>
-            <span className={cx(styles.floatCard, styles.floatBottom)}>
-              <b>6 месяцев</b> гарантии на работы
-            </span>
+            <img
+              className={styles.heroPhoto}
+              src="/photos/mainPageCard1.webp"
+              alt="Профессиональная кофемашина в работе: из группы валит пар"
+              decoding="async"
+            />
           </div>
         </div>
       </section>
