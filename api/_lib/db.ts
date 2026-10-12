@@ -1,11 +1,11 @@
 /**
- * Работа с базой: подключение к Postgres (Neon) и схема.
+ * Работа с базой: подключение к Postgres и схема.
  *
  * Подключение ленивое: пул создаётся при первом запросе, а не при загрузке
  * модуля. Так сборка и локальная разработка проходят даже без DATABASE_URL,
  * а ошибка появляется только когда действительно понадобилась база.
  */
-import { Pool, type PoolClient } from 'pg'
+import { Pool } from 'pg'
 
 declare global {
   // В режиме разработки модуль может перезагружаться — пул держим в globalThis,
@@ -40,8 +40,6 @@ CREATE INDEX IF NOT EXISTS site_requests_created_at_idx ON site_requests (create
 /** Адрес базы: Vercel и Neon кладут его в DATABASE_URL */
 export const databaseUrl = (): string | undefined =>
   process.env.DATABASE_URL ?? process.env.POSTGRES_URL
-
-export const isDatabaseConfigured = (): boolean => Boolean(databaseUrl())
 
 export const getPool = (): Pool => {
   const url = databaseUrl()
@@ -91,15 +89,4 @@ export const query = async <T>(sql: string, params: unknown[] = []): Promise<T[]
   const pool = getPool()
   const result = await pool.query(sql, params)
   return result.rows as T[]
-}
-
-/** Транзакция: пригодится, когда одной вставки мало */
-export const withClient = async <T>(run: (client: PoolClient) => Promise<T>): Promise<T> => {
-  await ready()
-  const client = await getPool().connect()
-  try {
-    return await run(client)
-  } finally {
-    client.release()
-  }
 }
