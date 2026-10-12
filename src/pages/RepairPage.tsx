@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
+import { EditableBlock } from '../components/EditableBlock'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
 import { EDITABLE_BLOCKS } from '../data/editableBlocks'
@@ -11,16 +12,11 @@ import ui from '../styles/ui.module.css'
 import styles from './RepairPage.module.css'
 
 /**
- * Тексты первого экрана лежат в справочнике редактируемых блоков:
- * оттуда же их берёт форма в админке, поэтому подпись и значение
- * не разъедутся. Здесь только находим нужные дефолты по ключу.
+ * Описание первого экрана лежит в справочнике редактируемых блоков: оттуда же
+ * берутся поля формы, поэтому подписи и тексты не разъедутся.
+ * Админ правит этот блок прямо на странице — см. EditableBlock.
  */
-const HERO = EDITABLE_BLOCKS.find((block) => block.key === BLOCK_KEYS.repairHero)?.defaults ?? {
-  title: '',
-  lead: '',
-  actionOne: '',
-  actionTwo: '',
-}
+const HERO_BLOCK = EDITABLE_BLOCKS.find((block) => block.key === BLOCK_KEYS.repairHero)
 
 /**
  * Ремонт кофемашин: направления работ, порядок действий, ориентиры по цене,
@@ -28,25 +24,32 @@ const HERO = EDITABLE_BLOCKS.find((block) => block.key === BLOCK_KEYS.repairHero
  * в контактах.
  */
 export const RepairPage = observer(function RepairPage() {
-  const { repair, contacts, content } = useStore()
+  const { repair, contacts } = useStore()
   const phone = contacts.channels.find((channel) => channel.href?.startsWith('tel:'))
-  const hero = content.block(BLOCK_KEYS.repairHero, HERO)
 
   return (
     <section className={cx(ui.container, styles.page)}>
-      <SectionHeading kicker="Ремонт" title={hero.title} lead={hero.lead} />
+      {HERO_BLOCK ? (
+        <EditableBlock config={HERO_BLOCK}>
+          {(hero) => (
+            <>
+              <SectionHeading kicker="Ремонт" title={hero.title} lead={hero.lead} />
 
-      <div className={styles.actions}>
-        {phone ? (
-          <a className={ui.btn} href={phone.href}>
-            {/* Телефон подставляем из справочника: в админке меняется только надпись */}
-            {hero.actionOne}: {phone.value}
-          </a>
-        ) : null}
-        <Link className={cx(ui.btn, ui.btnGhost)} to={ROUTES.contacts.path}>
-          {hero.actionTwo}
-        </Link>
-      </div>
+              <div className={styles.actions}>
+                {phone ? (
+                  <a className={ui.btn} href={phone.href}>
+                    {/* Телефон берём из справочника: правится только надпись кнопки */}
+                    {hero.actionOne}: {phone.value}
+                  </a>
+                ) : null}
+                <Link className={cx(ui.btn, ui.btnGhost)} to={ROUTES.contacts.path}>
+                  {hero.actionTwo}
+                </Link>
+              </div>
+            </>
+          )}
+        </EditableBlock>
+      ) : null}
 
       <div className={styles.directions}>
         {repair.directions.map((direction, index) => (

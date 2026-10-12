@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { ContentEditor } from '../components/ContentEditor'
 import { SectionHeading } from '../components/SectionHeading'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
@@ -19,24 +18,16 @@ const formatDate = (value: string): string =>
     new Date(value),
   )
 
-/** Разделы админки */
-const TABS = [
-  { id: 'requests', label: 'Заявки' },
-  { id: 'users', label: 'Пользователи' },
-  { id: 'content', label: 'Тексты' },
-] as const
-
-type TabId = (typeof TABS)[number]['id']
-
 /**
- * Админка: заявки с сайта, список пользователей и правка текстов блоков.
- * Доступ проверяет RequireAuth по роли, серверные ручки — ещё раз на своей стороне.
+ * Админка: заявки с сайта и список пользователей.
+ * Тексты блоков правятся не здесь, а прямо на страницах: админ наводит курсор
+ * на блок и нажимает «Изменить» — см. components/EditableBlock.tsx.
  */
 export const AdminPage = observer(function AdminPage() {
   const { auth } = useStore()
 
   // Таб — чисто интерфейсное состояние, поэтому живёт в компоненте
-  const [tab, setTab] = useState<TabId>('requests')
+  const [tab, setTab] = useState<'requests' | 'users'>('requests')
 
   useEffect(() => {
     void auth.loadRequests()
@@ -47,23 +38,25 @@ export const AdminPage = observer(function AdminPage() {
     <section className={cx(ui.container, styles.page)}>
       <SectionHeading
         kicker="Админка"
-        title="Заявки, пользователи и тексты"
-        lead="Заявки приходят из формы на странице контактов. Тексты блоков правятся здесь же и сразу появляются на сайте. Раздел открыт только администратору."
+        title="Заявки и пользователи"
+        lead="Заявки приходят из формы на странице контактов. Тексты блоков правятся прямо на страницах сайта: наведите курсор на блок и нажмите «Изменить»."
       />
 
       <div className={styles.tabs}>
-        {TABS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={cx(styles.tab, tab === item.id && styles.tabActive)}
-            onClick={() => setTab(item.id)}
-          >
-            {item.label}
-            {item.id === 'requests' && auth.requests.length ? ` (${auth.requests.length})` : ''}
-            {item.id === 'users' && auth.users.length ? ` (${auth.users.length})` : ''}
-          </button>
-        ))}
+        <button
+          type="button"
+          className={cx(styles.tab, tab === 'requests' && styles.tabActive)}
+          onClick={() => setTab('requests')}
+        >
+          Заявки {auth.requests.length ? `(${auth.requests.length})` : ''}
+        </button>
+        <button
+          type="button"
+          className={cx(styles.tab, tab === 'users' && styles.tabActive)}
+          onClick={() => setTab('users')}
+        >
+          Пользователи {auth.users.length ? `(${auth.users.length})` : ''}
+        </button>
       </div>
 
       {auth.error ? (
@@ -71,8 +64,6 @@ export const AdminPage = observer(function AdminPage() {
           {auth.error}
         </p>
       ) : null}
-
-      {tab === 'content' ? <ContentEditor /> : null}
 
       {tab === 'requests' ? (
         <div className={styles.panel}>
