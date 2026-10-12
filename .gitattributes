@@ -4,6 +4,12 @@
 # prettier --check начинает падать на каждом файле.
 * text=auto eol=lf
 
+# Исключение: скрипты для Windows обязаны быть в CRLF.
+# cmd.exe не разбирает .cmd с переводами строк LF, а PowerShell 5.1 читает
+# .ps1 в системной кодировке, поэтому файлы дополнительно держим в UTF-8 с BOM.
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
 # Бинарные файлы не трогаем
 *.png binary
 *.jpg binary
