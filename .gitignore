@@ -34,3 +34,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Связка с проектом Vercel: у каждого своя, в репозиторий не едет
+.vercel/
