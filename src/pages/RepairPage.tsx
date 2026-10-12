@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
+import { AddDirectionCard, DirectionCard, DirectionsLimit } from '../components/DirectionCard'
 import { EditableBlock } from '../components/EditableBlock'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
@@ -10,6 +11,7 @@ import { BLOCK_KEYS } from '../stores/ContentStore'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './RepairPage.module.css'
+import directionStyles from '../components/DirectionCard.module.css'
 
 /**
  * Описание первого экрана лежит в справочнике редактируемых блоков: оттуда же
@@ -24,7 +26,7 @@ const HERO_BLOCK = EDITABLE_BLOCKS.find((block) => block.key === BLOCK_KEYS.repa
  * в контактах.
  */
 export const RepairPage = observer(function RepairPage() {
-  const { repair, contacts } = useStore()
+  const { repair, contacts, directions } = useStore()
   const phone = contacts.channels.find((channel) => channel.href?.startsWith('tel:'))
 
   return (
@@ -51,26 +53,26 @@ export const RepairPage = observer(function RepairPage() {
         </EditableBlock>
       ) : null}
 
-      <div className={styles.directions}>
-        {repair.directions.map((direction, index) => (
-          <Reveal key={direction.title} delay={index * 70}>
-            <article className={cx(ui.card, styles.direction)}>
-              <span className={styles.directionIcon} aria-hidden="true">
-                {direction.icon}
-              </span>
-              <h3 className={styles.directionTitle}>{direction.title}</h3>
-              <p className={ui.muted}>{direction.text}</p>
-              <ul className={styles.points}>
-                {direction.points.map((point) => (
-                  <li key={point} className={styles.point}>
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          </Reveal>
-        ))}
-      </div>
+      {/*
+        Карточки направлений живут в базе: админ добавляет, правит и удаляет их
+        прямо здесь. Пока они грузятся, ничего не показываем, чтобы не мигало.
+      */}
+      {directions.loading ? null : (
+        <>
+          <div className={directionStyles.grid}>
+            {/*
+              Карточки оборачиваются в появление сами: в режиме правки
+              компонент возвращает форму без обёртки, чтобы она не растягивала
+              высоту строки сетки.
+            */}
+            {directions.directions.map((direction, index) => (
+              <DirectionCard key={direction.id} direction={direction} delay={index * 70} />
+            ))}
+            <AddDirectionCard />
+          </div>
+          <DirectionsLimit />
+        </>
+      )}
 
       <div className={styles.split}>
         <div>

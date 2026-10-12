@@ -96,3 +96,31 @@ export const toSiteContent = (row: SiteContentRow): SiteContent => ({
   actionTwo: row.action_two ?? undefined,
   updatedAt: row.updated_at,
 })
+
+/** Сколько карточек направлений разрешено держать */
+export const MAX_DIRECTIONS = 6
+
+export interface DirectionRow {
+  id: number
+  position: number
+  icon: string
+  title: string
+  text: string
+  points: string[]
+}
+
+export interface Direction {
+  id: number
+  icon: string
+  title: string
+  text: string
+  points: string[]
+}
+
+export const toDirection = (row: DirectionRow): Direction => ({
+  id: row.id,
+  icon: row.icon,
+  title: row.title,
+  text: row.text,
+  points: row.points,
+})

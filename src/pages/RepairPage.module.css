@@ -10,65 +10,10 @@
   margin-bottom: 40px;
 }
 
-.directions {
-  display: grid;
-  /* Пять направлений: по 300 px минимум — на десктопе выходит 3 + 2,
-     карточки не сжимаются в узкие колонки */
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 18px;
-  margin-bottom: 56px;
-}
-
-.direction {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: 100%;
-  padding: 24px;
-  transition:
-    transform 0.35s var(--ease),
-    border-color 0.35s var(--ease);
-}
-
-.direction:hover {
-  transform: translateY(-6px);
-  border-color: var(--line-strong);
-}
-
-.directionIcon {
-  font-size: 1.5rem;
-}
-
-.directionTitle {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 400;
-}
-
-.points {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
-  font-size: 0.9rem;
-}
-
-.point {
-  position: relative;
-  padding-left: 18px;
-  color: var(--cream);
-}
-
-.point::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.65em;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-}
+/*
+ * Стили карточек направлений переехали в components/DirectionCard.module.css:
+ * карточки теперь отдельный компонент, который админ правит и удаляет.
+ */
 
 .split {
   display: grid;

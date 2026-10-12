@@ -18,6 +18,7 @@
     "db:clean": "docker compose down -v",
     "db:status": "node scripts/db-status.mjs",
     "db:wipe": "node scripts/reset-db.mjs",
+    "db:directions": "node scripts/reset-directions.mjs",
     "check:api": "node scripts/check-api.mjs",
     "check:auth": "node scripts/check-auth.mjs",
     "check:crypto": "node --experimental-strip-types --no-warnings api/_lib/selftest.ts",

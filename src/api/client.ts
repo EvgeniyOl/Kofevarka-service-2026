@@ -5,9 +5,15 @@
  * credentials: 'include' обязателен: сессия лежит в httpOnly-cookie, и без
  * этого браузер не отправит её на другие страницы сайта.
  */
-import type { PublicUser, SiteContent, SiteRequest, RequestStatus } from '../../api/_lib/types'
+import type {
+  Direction,
+  PublicUser,
+  SiteContent,
+  SiteRequest,
+  RequestStatus,
+} from '../../api/_lib/types'
 
-export type { PublicUser, SiteContent, SiteRequest, RequestStatus }
+export type { Direction, PublicUser, SiteContent, SiteRequest, RequestStatus }
 
 /** Ошибка с текстом от сервера: показываем её прямо в форме */
 export class ApiError extends Error {
@@ -101,5 +107,32 @@ export const api = {
     request<{ block: SiteContent | null }>('/content', {
       method: 'PUT',
       body: JSON.stringify(data),
+    }),
+
+  /** Карточки направлений ремонта: читают все, меняет только админ */
+  directions: () => request<{ directions: Direction[] }>('/directions'),
+
+  addDirection: (data: { icon: string; title: string; text: string; points: string[] }) =>
+    request<{ direction: Direction }>('/directions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updateDirection: (data: {
+    id: number
+    icon: string
+    title: string
+    text: string
+    points: string[]
+  }) =>
+    request<{ direction: Direction }>('/directions', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  removeDirection: (id: number) =>
+    request<{ ok: true }>('/directions', {
+      method: 'DELETE',
+      body: JSON.stringify({ id }),
     }),
 }

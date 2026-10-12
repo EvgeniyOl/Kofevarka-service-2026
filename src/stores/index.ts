@@ -3,6 +3,7 @@ import { AuthStore } from './AuthStore'
 import { ContactsStore } from './ContactsStore'
 import { ContentStore } from './ContentStore'
 import { DeliveryStore } from './DeliveryStore'
+import { DirectionsStore } from './DirectionsStore'
 import { HomeStore } from './HomeStore'
 import { RepairStore } from './RepairStore'
 import { SubscriptionStore } from './SubscriptionStore'
@@ -22,6 +23,8 @@ export class RootStore {
   readonly auth: AuthStore
   /** Тексты блоков, которые правит админ */
   readonly content: ContentStore
+  /** Карточки направлений ремонта: их можно добавлять и удалять */
+  readonly directions: DirectionsStore
 
   constructor() {
     this.home = new HomeStore()
@@ -32,6 +35,7 @@ export class RootStore {
     this.contacts = new ContactsStore()
     this.auth = new AuthStore()
     this.content = new ContentStore()
+    this.directions = new DirectionsStore()
   }
 }
 

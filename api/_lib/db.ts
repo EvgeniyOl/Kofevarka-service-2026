@@ -51,6 +51,67 @@ CREATE TABLE IF NOT EXISTS site_content (
   action_two TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+/*
+ * Служебные отметки: например, что стартовый набор карточек уже заливался.
+ * Без этого признака удалённые карточки возвращались бы при каждом запросе:
+ * таблица пуста — значит, «свежая база».
+ */
+CREATE TABLE IF NOT EXISTS site_meta (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+/*
+ * Направления ремонта — карточки на странице «Ремонт». В отличие от текстов,
+ * здесь строки есть всегда: админ может добавлять и удалять карточки, поэтому
+ * таблица служит источником данных, а не набором правок.
+ * position задаёт порядок вывода, чтобы карточки не перемешивались.
+ */
+CREATE TABLE IF NOT EXISTS repair_directions (
+  id         SERIAL PRIMARY KEY,
+  position   INTEGER NOT NULL DEFAULT 0,
+  icon       TEXT NOT NULL DEFAULT '',
+  title      TEXT NOT NULL,
+  text       TEXT NOT NULL DEFAULT '',
+  points     TEXT[] NOT NULL DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS repair_directions_position_idx ON repair_directions (position, id);
+`
+
+/** Отметка о том, что стартовые карточки уже залиты */
+const DIRECTIONS_SEED_FLAG = 'repair_directions_seeded'
+
+/**
+ * Карточки, которые показываются на странице «Ремонт» в свежей базе.
+ * Заливаем их один раз и только если таблицу ещё не наполняли: дальше админ
+ * распоряжается карточками сам. Если он удалит все, они не вернутся —
+ * признак хранится в site_meta, а не выводится из пустоты таблицы.
+ */
+const DEFAULT_DIRECTIONS_SQL = `
+WITH seed(position, icon, title, text, points) AS (
+  VALUES
+    (1, '🏭', 'Профессиональные кофемашины',
+     'Аппараты для кофеен, баров и офисов: одиночные группы, двухгруппники, автоматические и суперавтоматы.',
+     ARRAY['бойлер и гидросистема', 'замена помпы и клапанов', 'температура и давление', 'подменный аппарат на время работ']),
+    (2, '🏠', 'Бытовые кофемашины',
+     'Домашние автоматические и рожковые машины: чистим от накипи, меняем изношенные узлы, восстанавливаем настройки.',
+     ARRAY['накипь и засоры', 'кофемолка и дозатор', 'капучинатор и пар', 'течь и шум помпы']),
+    (3, '⚙️', 'Кофемолки и техника',
+     'Жерновые и ручные кофемолки, капсульные машины, фильтры для воды — всё, что стоит рядом с кофе.',
+     ARRAY['замена жерновов', 'калибровка помола', 'ремонт капсульных машин', 'замена картриджей']),
+    (4, '📋', 'Обслуживание по договору',
+     'Для кофеен и офисов: приезжаем по графику, чистим и проверяем технику до того, как она встанет.',
+     ARRAY['чистка и декальцинация', 'проверка помола и давления', 'отчёт по каждой машине', 'приоритет при поломке']),
+    (5, '🚚', 'Выезд мастера',
+     'Ремонт на месте: приезжаем с запчастями и инструментом, большинство аппаратов поднимаем за один визит.',
+     ARRAY['по Омску и области', 'запчасти с собой', 'заберём и вернём машину', 'работы в удобное время'])
+)
+INSERT INTO repair_directions (position, icon, title, text, points)
+SELECT position, icon, title, text, points FROM seed
+WHERE NOT EXISTS (SELECT 1 FROM site_meta WHERE key = $1);
 `
 
 /** Адрес базы: Vercel и Neon кладут его в DATABASE_URL */
@@ -105,4 +166,36 @@ export const query = async <T>(sql: string, params: unknown[] = []): Promise<T[]
   const pool = getPool()
   const result = await pool.query(sql, params)
   return result.rows as T[]
+}
+
+/**
+ * Наполняет таблицу направлений стартовыми карточками — один раз за всё время
+ * жизни базы. Отметку ставим в site_meta, поэтому если админ удалит все
+ * карточки, они не вернутся.
+ */
+export const seedDirections = async (): Promise<void> => {
+  await ready()
+  const client = await getPool().connect()
+
+  try {
+    await client.query('BEGIN')
+    const flag = await client.query('SELECT 1 FROM site_meta WHERE key = $1', [
+      DIRECTIONS_SEED_FLAG,
+    ])
+
+    if (!flag.rowCount) {
+      await client.query(DEFAULT_DIRECTIONS_SQL, [DIRECTIONS_SEED_FLAG])
+      await client.query('INSERT INTO site_meta (key, value) VALUES ($1, $2)', [
+        DIRECTIONS_SEED_FLAG,
+        new Date().toISOString(),
+      ])
+    }
+
+    await client.query('COMMIT')
+  } catch (error) {
+    await client.query('ROLLBACK')
+    throw error
+  } finally {
+    client.release()
+  }
 }
