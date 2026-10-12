@@ -12,6 +12,15 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f db",
+    "db:clean": "docker compose down -v",
+    "db:status": "node scripts/db-status.mjs",
+    "db:wipe": "node scripts/reset-db.mjs",
+    "check:api": "node scripts/check-api.mjs",
+    "check:auth": "node scripts/check-auth.mjs",
+    "check:crypto": "node --experimental-strip-types --no-warnings api/_lib/selftest.ts",
     "prepare": "husky"
   },
   "dependencies": {

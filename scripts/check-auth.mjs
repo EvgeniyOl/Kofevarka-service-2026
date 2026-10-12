@@ -2,12 +2,35 @@
  * Сквозная проверка авторизации: регистрация, вход, роли, права и заявки.
  * Требует запущенного `npm run dev` с подключённой базой.
  *
- * Запуск: node check-auth.mjs [адрес]
+ * Запуск: npm run check:auth   (или node scripts/check-auth.mjs [адрес])
+ *
+ * Проверка «первый пользователь становится админом» работает только на пустой
+ * таблице пользователей, поэтому скрипт предупреждает, если база не пуста,
+ * и в конце удаляет созданные им записи — накопленного мусора не остаётся.
  */
+import { readFileSync } from 'node:fs'
+import pg from 'pg'
+
 const BASE = process.argv[2] ?? 'http://localhost:5000'
+
+/** Строка подключения: из окружения или из .env.local */
+const connectionString = (() => {
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL
+  try {
+    return readFileSync('.env.local', 'utf8')
+      .split('\n')
+      .find((line) => line.startsWith('DATABASE_URL='))
+      ?.slice('DATABASE_URL='.length)
+      .trim()
+  } catch {
+    return undefined
+  }
+})()
 
 let failed = 0
 const results = []
+/** Почты, созданные этим прогоном: их удалим в конце */
+const createdEmails = []
 
 const check = (name, ok, detail = '') => {
   if (!ok) failed += 1
@@ -48,13 +71,42 @@ const call = async (path, { method = 'GET', body, cookie } = {}) => {
 const stamp = Date.now()
 const adminEmail = `admin-${stamp}@example.com`
 const clientEmail = `client-${stamp}@example.com`
+const thirdEmail = `third-${stamp}@example.com`
 const password = 'kofevarka-2026'
+
+/*
+ * Предупреждаем, если база не пуста: проверка «первый становится админом»
+ * имеет смысл только на пустой таблице. Пользователей не удаляем — в базе
+ * могут быть настоящие аккаунты.
+ */
+let usersBefore = null
+if (connectionString) {
+  const probe = new pg.Client({ connectionString })
+  try {
+    await probe.connect()
+    const count = await probe.query('SELECT count(*)::int AS total FROM users')
+    usersBefore = count.rows[0].total
+  } catch {
+    usersBefore = null
+  } finally {
+    await probe.end().catch(() => {})
+  }
+}
+
+if (usersBefore) {
+  console.log(
+    `ВНИМАНИЕ: в базе уже ${usersBefore} пользовател(ь/я/ей), поэтому первый зарегистрированный\n` +
+      'получит роль клиента, а не администратора — часть проверок ниже упадёт.\n' +
+      'Для полного прогона очистите данные: npm run db:wipe\n',
+  )
+}
 
 // — 1. Регистрация первого пользователя: он должен стать админом —
 const first = await call('/api/auth/register', {
   method: 'POST',
   body: { name: 'Владелец', email: adminEmail, password },
 })
+createdEmails.push(adminEmail)
 check(
   'первый пользователь зарегистрирован и стал админом',
   first.status === 201 && first.payload?.user?.role === 'admin',
@@ -68,6 +120,7 @@ const second = await call('/api/auth/register', {
   method: 'POST',
   body: { name: 'Клиент', email: clientEmail, password },
 })
+createdEmails.push(clientEmail)
 check(
   'второй пользователь получил роль клиента',
   second.status === 201 && second.payload?.user?.role === 'client',
@@ -176,8 +229,9 @@ check('нельзя снять роль с себя', demoteSelf.status === 400,
 // поэтому его cookie теперь соответствует администратору
 const third = await call('/api/auth/register', {
   method: 'POST',
-  body: { name: 'Третий', email: `third-${stamp}@example.com`, password },
+  body: { name: 'Третий', email: thirdEmail, password },
 })
+createdEmails.push(thirdEmail)
 const clientPatch = await call('/api/users', {
   method: 'PATCH',
   body: { id: third.payload?.user?.id, role: 'admin' },
@@ -199,6 +253,53 @@ check(
 const forged = await call('/api/users', { cookie: 'kofevarka_session=ZmFrZQ.forged' })
 check('поддельная сессия не даёт доступ', forged.status === 401, `HTTP ${forged.status}`)
 
+/*
+ * Убираем за собой: удаляем только те аккаунты и заявки, которые создал
+ * этот прогон. Настоящие данные в базе не трогаем.
+ */
+let cleaned = 0
+if (connectionString) {
+  const client = new pg.Client({ connectionString })
+  try {
+    await client.connect()
+
+    // Сначала смотрим, что вообще нашлось: если удаление не сработает,
+    // будет видно, в чём причина
+    const found = await client.query('SELECT id, email FROM users WHERE email = ANY($1)', [
+      createdEmails,
+    ])
+    const requestsFound = await client.query(
+      'SELECT id, email FROM site_requests WHERE email = ANY($1)',
+      [['guest@example.com', clientEmail]],
+    )
+
+    const users = await client.query('DELETE FROM users WHERE id = ANY($1::int[]) RETURNING id', [
+      found.rows.map((row) => row.id),
+    ])
+    const requests = await client.query(
+      'DELETE FROM site_requests WHERE id = ANY($1::int[]) RETURNING id',
+      [requestsFound.rows.map((row) => row.id)],
+    )
+
+    cleaned = users.rowCount + requests.rowCount
+
+    if (found.rowCount !== users.rowCount || requestsFound.rowCount !== requests.rowCount) {
+      console.log(
+        `\nВНИМАНИЕ: нашлось ${found.rowCount} пользователей и ${requestsFound.rowCount} заявок, ` +
+          `а удалилось ${users.rowCount} и ${requests.rowCount}. Проверьте базу вручную.`,
+      )
+    }
+  } catch (error) {
+    console.log(`\nНе удалось убрать тестовые данные: ${error.message}`)
+  } finally {
+    await client.end().catch(() => {})
+  }
+}
+
 console.log(results.join('\n'))
+if (cleaned) console.log(`\nудалено тестовых записей: ${cleaned}`)
+if (usersBefore) {
+  console.log('напоминание: база была не пуста, часть проверок ожидаемо упала')
+}
 console.log(failed ? `\nпровалено проверок: ${failed}` : '\nвсе проверки пройдены')
 process.exit(failed ? 1 : 0)
