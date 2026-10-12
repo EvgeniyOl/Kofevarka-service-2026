@@ -10,11 +10,12 @@ import type {
   Partner,
   PublicUser,
   SiteContent,
+  SiteItem,
   SiteRequest,
   RequestStatus,
 } from '../../api/_lib/types'
 
-export type { Direction, Partner, PublicUser, SiteContent, SiteRequest, RequestStatus }
+export type { Direction, Partner, PublicUser, SiteContent, SiteItem, SiteRequest, RequestStatus }
 
 /** Ошибка с текстом от сервера: показываем её прямо в форме */
 export class ApiError extends Error {
@@ -98,13 +99,7 @@ export const api = {
   /** Редактируемые тексты блоков: читают все, сохраняет только админ */
   content: () => request<{ blocks: SiteContent[] }>('/content'),
 
-  saveContent: (data: {
-    key: string
-    title?: string
-    lead?: string
-    actionOne?: string
-    actionTwo?: string
-  }) =>
+  saveContent: (data: { key: string; fields: Record<string, string> }) =>
     request<{ block: SiteContent | null }>('/content', {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -154,6 +149,36 @@ export const api = {
 
   removePartner: (id: number) =>
     request<{ ok: true }>('/partners', {
+      method: 'DELETE',
+      body: JSON.stringify({ id }),
+    }),
+
+  /**
+   * Универсальные списки: цифры, шаги, цены, вопросы, отзывы.
+   * Читают все, меняет только админ.
+   */
+  items: () => request<{ lists: Record<string, { items: SiteItem[]; seeded: boolean }> }>('/items'),
+
+  seedItems: (kind: string, items: Record<string, string>[]) =>
+    request<{ items: SiteItem[]; seeded: boolean }>('/items', {
+      method: 'PUT',
+      body: JSON.stringify({ kind, items }),
+    }),
+
+  addItem: (kind: string, fields: Record<string, string>) =>
+    request<{ item: SiteItem }>('/items', {
+      method: 'POST',
+      body: JSON.stringify({ kind, fields }),
+    }),
+
+  updateItem: (id: number, fields: Record<string, string>) =>
+    request<{ item: SiteItem }>('/items', {
+      method: 'PATCH',
+      body: JSON.stringify({ id, fields }),
+    }),
+
+  removeItem: (id: number) =>
+    request<{ ok: true }>('/items', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),

@@ -13,6 +13,9 @@
  * Обёртка появления вокруг карточки: растягиваем её на высоту строки, чтобы
  * карточки в ряду были одной высоты. Форму правки так не растягиваем —
  * иначе соседи в её ряду станут такими же высокими и в них появится пустота.
+ *
+ * Карточку растягиваем через flex: 1: иначе её ширина считается по контенту
+ * и отступы между карточками в ряду получаются разными.
  */
 .wrap {
   display: flex;
@@ -22,8 +25,10 @@
 .card {
   position: relative;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
   height: 100%;
   padding: 24px;
 }
@@ -173,8 +178,8 @@
 
 .actions {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 10px;
   margin-top: 16px;
 }

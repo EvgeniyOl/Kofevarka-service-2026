@@ -82,11 +82,12 @@
   resize: vertical;
 }
 
+/* Кнопки формы — в столбик и во всю ширину, как в формах списков */
 .actions {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
 }
 
 .saved {

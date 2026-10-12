@@ -64,37 +64,60 @@ export const toSiteRequest = (row: SiteRequestRow): SiteRequest => ({
 })
 
 /**
- * Редактируемый блок сайта. Все поля, кроме ключа, могут быть пустыми:
- * пустое значение означает «оставить текст из кода», поэтому админ
- * может менять только заголовок, не трогая остальное.
+ * Редактируемый блок сайта. Поля лежат объектом: у каждого блока свой набор,
+ * поэтому схема таблицы не знает, какие именно тексты в нём. Пустое значение
+ * означает «оставить текст из кода» — админ может поменять только заголовок,
+ * не трогая остальное.
  */
 export interface SiteContentRow {
   key: string
-  title: string | null
-  lead: string | null
-  action_one: string | null
-  action_two: string | null
+  fields: Record<string, string>
   updated_at: string
 }
 
 export interface SiteContent {
   key: string
-  title?: string
-  lead?: string
-  actionOne?: string
-  actionTwo?: string
+  fields: Record<string, string>
   updatedAt: string
 }
 
 export const toSiteContent = (row: SiteContentRow): SiteContent => ({
   key: row.key,
-  // null превращаем в undefined: так фронтенд отличает «не задано»
-  // от «задано пустой строкой»
-  title: row.title ?? undefined,
-  lead: row.lead ?? undefined,
-  actionOne: row.action_one ?? undefined,
-  actionTwo: row.action_two ?? undefined,
+  fields: row.fields ?? {},
   updatedAt: row.updated_at,
+})
+
+/** Сколько полей может быть в одном блоке */
+export const MAX_BLOCK_FIELDS = 12
+
+/** Предел длины одного поля блока */
+export const MAX_FIELD_LENGTH = 600
+
+/** Сколько полей может быть у элемента списка */
+export const MAX_ITEM_FIELDS = 12
+
+/** Предел длины одного поля элемента списка: в отзывах бывают длинные тексты */
+export const MAX_ITEM_FIELD_LENGTH = 1200
+
+/** Сколько элементов разрешено держать в одном списке */
+export const MAX_ITEMS = 60
+
+/** Элемент универсального списка: набор полей зависит от списка */
+export interface SiteItemRow {
+  id: number
+  kind: string
+  position: number
+  fields: Record<string, string>
+}
+
+export interface SiteItem {
+  id: number
+  fields: Record<string, string>
+}
+
+export const toSiteItem = (row: SiteItemRow): SiteItem => ({
+  id: row.id,
+  fields: row.fields ?? {},
 })
 
 /** Сколько карточек направлений разрешено держать */

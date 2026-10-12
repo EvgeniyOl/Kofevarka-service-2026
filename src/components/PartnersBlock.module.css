@@ -5,7 +5,12 @@
   gap: 18px;
 }
 
-/* Обёртка появления: растягиваем на высоту строки, чтобы низ ряда был ровным */
+/*
+ * Обёртка появления. Карточка внутри неё должна занять всю ширину колонки,
+ * поэтому обёртка — flex, а карточка растягивается через flex: 1.
+ * Без этого ширина карточки считалась по контенту: у партнёра с длинной
+ * подписью она была шире, у короткой — уже, и отступы в ряду разъезжались.
+ */
 .wrap {
   display: flex;
 }
@@ -13,8 +18,10 @@
 .card {
   position: relative;
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 14px;
+  min-width: 0;
   height: 100%;
   padding: 22px;
 }
@@ -146,12 +153,12 @@
   resize: vertical;
 }
 
-/* Строка загрузки: кнопка и подпись с именем файла */
+/* Кнопки загрузки логотипа: в столбик и во всю ширину, как кнопки формы */
 .upload {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
 }
 
 .fileInput {
@@ -178,8 +185,8 @@
 
 .actions {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 10px;
 }
 

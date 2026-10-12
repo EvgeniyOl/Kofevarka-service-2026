@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { emptyPartner, MAX_LOGO_BYTES, LOGO_MAX_WIDTH, type PartnerInput } from '../data/partners'
+import { useConfirmDelete } from '../hooks/useConfirmDelete'
 import { useStore } from '../stores/context'
 import type { Partner } from '../api/client'
 import { formatBytes, processImage } from '../utils/imageFile'
@@ -201,23 +202,19 @@ export const PartnerCard = observer(function PartnerCard({
 }) {
   const { partners, auth } = useStore()
   const [editing, setEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const canEdit = auth.isAdmin
+
+  const remove = async () => {
+    await partners.remove(partner.id)
+  }
+
+  const { armed, request, setCard, disarm } = useConfirmDelete(remove)
 
   const save = async (values: PartnerInput): Promise<boolean> => {
     const ok = await partners.update(partner.id, values)
     if (ok) setEditing(false)
     return ok
-  }
-
-  const remove = async () => {
-    // Удаляем со второго нажатия: случайный клик не должен сносить партнёра
-    if (!confirmDelete) {
-      setConfirmDelete(true)
-      return
-    }
-    await partners.remove(partner.id)
   }
 
   // В режиме правки форму возвращаем без обёртки появления: она растягивает
@@ -235,7 +232,7 @@ export const PartnerCard = observer(function PartnerCard({
 
   return (
     <Reveal className={styles.wrap} delay={delay}>
-      <article className={cx(ui.card, styles.card)}>
+      <article className={cx(ui.card, styles.card)} ref={setCard}>
         {canEdit ? (
           <div className={styles.toolbar}>
             <button
@@ -243,7 +240,7 @@ export const PartnerCard = observer(function PartnerCard({
               className={styles.action}
               onClick={() => {
                 partners.clearError()
-                setConfirmDelete(false)
+                disarm()
                 setEditing(true)
               }}
             >
@@ -252,10 +249,9 @@ export const PartnerCard = observer(function PartnerCard({
             <button
               type="button"
               className={cx(styles.action, styles.actionDanger)}
-              onClick={() => void remove()}
-              onBlur={() => setConfirmDelete(false)}
+              onClick={request}
             >
-              {confirmDelete ? 'Точно удалить?' : 'Удалить'}
+              {armed ? 'Точно удалить?' : 'Удалить'}
             </button>
           </div>
         ) : null}

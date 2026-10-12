@@ -1,0 +1,186 @@
+/*
+ * Обёртка одного элемента списка. Намеренно не задаёт ни flex, ни ширину:
+ * у посетителя такая же обёртка, только без кнопок, поэтому вид не должен
+ * зависеть от того, кто смотрит страницу. Относительное позиционирование
+ * нужно кнопкам правки.
+ */
+.item {
+  position: relative;
+}
+
+.toolbar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+
+.item:hover .toolbar,
+.toolbar:focus-within {
+  opacity: 1;
+}
+
+/* На телефоне наведения нет — кнопки показываем всегда */
+@media (hover: none) {
+  .toolbar {
+    opacity: 1;
+  }
+}
+
+.action {
+  padding: 5px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--bg-soft);
+  font-size: 0.76rem;
+  color: var(--cream);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.action:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.actionDanger:hover {
+  border-color: #b8543f;
+  color: #e79a8a;
+}
+
+/* — Форма: элемент превращается в набор полей — */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/*
+ * Кнопки формы — в столбик и во всю ширину: форма идёт в узкой карточке,
+ * и рядом друг с другом кнопки сжимались до нечитаемых.
+ */
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Превью загруженной картинки: видно, что именно попадёт в карточку */
+.preview {
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.previewImage {
+  max-width: 100%;
+  max-height: 140px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+/* Строка загрузки: кнопки идут в столбик, как и кнопки формы */
+.upload {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.fileInput {
+  display: none;
+}
+
+.textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.error {
+  padding: 10px 14px;
+  border: 1px solid rgba(184, 84, 63, 0.5);
+  border-radius: var(--radius-sm);
+  background: rgba(184, 84, 63, 0.12);
+  font-size: 0.88rem;
+  color: #f0c2b8;
+}
+
+/* — Плитка добавления элемента — */
+.addCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 96px;
+  padding: 20px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.addCard:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.addIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.addText {
+  font-size: 0.9rem;
+}
+
+/* Когда правка недоступна — подсказка вместо кнопок */
+.notice {
+  grid-column: 1 / -1;
+  padding: 12px 16px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 0.86rem;
+  color: var(--muted);
+}

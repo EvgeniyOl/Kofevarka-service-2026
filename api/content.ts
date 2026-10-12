@@ -3,12 +3,14 @@
  *
  * GET  /api/content — все сохранённые блоки. Доступно всем: страницы читают
  *                     тексты при загрузке.
- * PUT  /api/content — сохранить блок (только админ). Тело:
- *                     { key, title?, lead?, actionOne?, actionTwo? }
+ * PUT  /api/content — сохранить блок (только админ). Тело: { key, fields }
  *
  * В базе лежат только изменённые блоки. Если блока нет, страница показывает
  * текст из кода — поэтому «сбросить правку» можно, очистив все поля: пустая
- * строка сохраняется как NULL, и блок снова берётся из кода.
+ * строка не сохраняется, и блок снова берётся из кода.
+ *
+ * Состав полей сервер не знает: он задаётся в коде страницы, а здесь лежит
+ * объектом. Так новый блок не требует правки схемы таблицы.
  */
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { query } from './_lib/db.js'
@@ -20,26 +22,55 @@ import {
   sendJson,
   HttpError,
 } from './_lib/http.js'
-import { toSiteContent, type SiteContentRow } from './_lib/types.js'
+import {
+  MAX_BLOCK_FIELDS,
+  MAX_FIELD_LENGTH,
+  toSiteContent,
+  type SiteContentRow,
+} from './_lib/types.js'
 
 interface Body {
   key?: unknown
-  title?: unknown
-  lead?: unknown
-  actionOne?: unknown
-  actionTwo?: unknown
+  fields?: unknown
 }
 
-/** Поле может быть пустым: это значит «вернуть текст из кода» */
-const optionalText = (value: unknown, field: string, max: number): string | null => {
-  if (value === undefined || value === null) return null
-  if (typeof value !== 'string') throw new HttpError(400, `Поле «${field}» должно быть текстом`)
+/**
+ * Поля блока: объект из строк. Пустые значения выбрасываем — они означают
+ * «вернуть текст из кода».
+ */
+const parseFields = (value: unknown): Record<string, string> => {
+  if (value === undefined || value === null) return {}
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    throw new HttpError(400, 'Поле «fields» должно быть объектом')
+  }
 
-  const trimmed = value.trim()
-  if (!trimmed) return null
-  if (trimmed.length > max) throw new HttpError(400, `Поле «${field}» слишком длинное`)
+  const entries = Object.entries(value as Record<string, unknown>)
+  if (entries.length > MAX_BLOCK_FIELDS) {
+    throw new HttpError(400, `В блоке не может быть больше ${MAX_BLOCK_FIELDS} полей`)
+  }
 
-  return trimmed
+  const fields: Record<string, string> = {}
+
+  for (const [name, raw] of entries) {
+    // Имя поля — идентификатор из кода: буквы, цифры, подчёркивание
+    if (!/^[a-zA-Z][a-zA-Z0-9_]{0,30}$/.test(name)) {
+      throw new HttpError(400, `Недопустимое имя поля «${name}»`)
+    }
+
+    if (typeof raw !== 'string') {
+      throw new HttpError(400, `Поле «${name}» должно быть текстом`)
+    }
+
+    const trimmed = raw.trim()
+    if (!trimmed) continue
+    if (trimmed.length > MAX_FIELD_LENGTH) {
+      throw new HttpError(400, `Поле «${name}» слишком длинное`)
+    }
+
+    fields[name] = trimmed
+  }
+
+  return fields
 }
 
 const listContent = async (res: ServerResponse): Promise<void> => {
@@ -52,33 +83,23 @@ const saveContent = async (req: IncomingMessage, res: ServerResponse): Promise<v
 
   // Ключ обязателен и ограничен по длине: это идентификатор блока в коде
   const key = requireString(body.key, 'Ключ блока', 100)
-
-  const values = [
-    key,
-    optionalText(body.title, 'Заголовок', 200),
-    optionalText(body.lead, 'Описание', 600),
-    optionalText(body.actionOne, 'Первая кнопка', 60),
-    optionalText(body.actionTwo, 'Вторая кнопка', 60),
-  ]
+  const fields = parseFields(body.fields)
 
   // Если все поля пустые, строку не храним: блок вернётся к тексту из кода
-  if (values.slice(1).every((value) => value === null)) {
+  if (!Object.keys(fields).length) {
     await query('DELETE FROM site_content WHERE key = $1', [key])
     sendJson(res, 200, { block: null })
     return
   }
 
   const rows = await query<SiteContentRow>(
-    `INSERT INTO site_content (key, title, lead, action_one, action_two)
-     VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO site_content (key, fields)
+     VALUES ($1, $2::jsonb)
      ON CONFLICT (key) DO UPDATE
-       SET title = EXCLUDED.title,
-           lead = EXCLUDED.lead,
-           action_one = EXCLUDED.action_one,
-           action_two = EXCLUDED.action_two,
+       SET fields = EXCLUDED.fields,
            updated_at = now()
      RETURNING *`,
-    values,
+    [key, JSON.stringify(fields)],
   )
 
   sendJson(res, 200, { block: toSiteContent(rows[0]) })

@@ -1,43 +1,44 @@
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
+import { EditableBlock } from '../components/EditableBlock'
+import { EditableList } from '../components/EditableList'
 import { ProductCard } from '../components/ProductCard'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
 import { StatValue } from '../components/StatValue'
-import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '../data/contacts'
-import { useStore } from '../stores/context'
+import { HOME_BLOCKS } from '../data/blocks/home'
+import { LIST_KEYS, listConfig } from '../data/lists'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './HomePage.module.css'
 
-/** Главная: ремонт кофемашин и кофе — герой, избранное, порядок работ, цифры, отзывы */
+/**
+ * Главная: ремонт кофемашин и кофе.
+ *
+ * Всё содержимое страницы — тексты и списки, включая подборку товаров, —
+ * правит админ прямо на странице. Значения по умолчанию лежат
+ * в data/blocks/home.ts и data/lists.ts.
+ */
 export const HomePage = observer(function HomePage() {
-  const { home } = useStore()
-
   return (
     <>
       <section className={styles.hero}>
         <div className={cx(ui.container, styles.heroInner)}>
-          <div className={styles.heroCopy}>
-            <span className={ui.eyebrow}>{home.kicker}</span>
+          <EditableBlock config={HOME_BLOCKS.hero}>
+            {(values) => (
+              <div className={styles.heroCopy}>
+                <span className={ui.eyebrow}>{values.kicker}</span>
 
-            <h1 className={styles.heroTitle}>
-              <span className={styles.brand}>{home.company}</span>
-              <span className={styles.tagline}>{home.heroTitle}</span>
-            </h1>
+                <h1 className={styles.heroTitle}>
+                  <span className={styles.brand}>{values.title}</span>
+                  <span className={styles.tagline}>{values.subtitle}</span>
+                </h1>
 
-            <p className={cx(ui.lead, styles.heroLead)}>{home.heroLead}</p>
-
-            <div className={styles.heroActions}>
-              <Link className={ui.btn} to={ROUTES.contacts.path}>
-                Вызвать мастера
-              </Link>
-              <a className={cx(ui.btn, ui.btnGhost)} href={`tel:${CONTACT_PHONE_HREF}`}>
-                {CONTACT_PHONE}
-              </a>
-            </div>
-          </div>
+                <p className={cx(ui.lead, styles.heroLead)}>{values.lead}</p>
+              </div>
+            )}
+          </EditableBlock>
 
           <div className={styles.heroArt}>
             <img
@@ -52,122 +53,148 @@ export const HomePage = observer(function HomePage() {
 
       <section className={ui.section}>
         <div className={ui.container}>
-          <SectionHeading
-            kicker="Что мы делаем"
-            title="Что берут вместе с ремонтом"
-            lead="Технику привозим и настраиваем, расходники и подменную машину подбираем вместе с ремонтом. Наличие и цену уточняйте по телефону — соберём заказ и привезём."
-          />
+          <EditableBlock config={HOME_BLOCKS.featured}>
+            {(values) => (
+              <SectionHeading kicker={values.kicker} title={values.title} lead={values.lead} />
+            )}
+          </EditableBlock>
 
-          <div className={styles.cards}>
-            {home.featured.map((product, index) => (
-              <Reveal key={product.id} delay={index * 80}>
-                <ProductCard product={product} variant="1" />
+          {/*
+            Подборка товаров: карточки живут в базе, админ правит, добавляет
+            и удаляет их прямо здесь. Подписи внутри карточки — часть её вида,
+            а не контент страницы.
+          */}
+          <EditableList
+            config={listConfig(LIST_KEYS.homeFeatured)}
+            className={styles.cards}
+            wrapper={(node) => <>{node}</>}
+          >
+            {(item) => (
+              <Reveal className={styles.cardWrap}>
+                <ProductCard fields={item.fields} />
               </Reveal>
-            ))}
-          </div>
+            )}
+          </EditableList>
         </div>
       </section>
 
       <section className={cx(ui.section, styles.valuesSection)}>
         <div className={ui.container}>
-          <SectionHeading
-            kicker="Как мы работаем"
-            title="Четыре правила, из которых ничего не выкинуть"
-            align="center"
-          />
-          <div className={styles.values}>
-            {home.values.map((value, index) => (
-              <Reveal key={value.title} delay={index * 90}>
+          <EditableBlock config={HOME_BLOCKS.values}>
+            {(values) => (
+              <SectionHeading kicker={values.kicker} title={values.title} align="center" />
+            )}
+          </EditableBlock>
+
+          <EditableList config={listConfig(LIST_KEYS.homeValues)} className={styles.values}>
+            {(item) => (
+              <Reveal>
                 <article className={cx(ui.card, styles.value)}>
                   <span className={styles.valueIcon} aria-hidden="true">
-                    {value.icon}
+                    {item.fields.icon}
                   </span>
-                  <h3 className={styles.valueTitle}>{value.title}</h3>
-                  <p className={ui.muted}>{value.text}</p>
+                  <h3 className={styles.valueTitle}>{item.fields.title}</h3>
+                  <p className={ui.muted}>{item.fields.text}</p>
                 </article>
               </Reveal>
-            ))}
-          </div>
+            )}
+          </EditableList>
         </div>
       </section>
 
       <section className={ui.section}>
         <div className={cx(ui.container, styles.process)}>
-          <SectionHeading
-            kicker="Процесс"
-            title="Как проходит ремонт"
-            lead="Четыре шага, после которых машина снова варит, а не шипит. Диагностика бесплатна, если ремонт делаем мы."
-          />
-          <ol className={styles.steps}>
-            {home.steps.map((step, index) => (
-              <li key={step.title} className={styles.step}>
+          <EditableBlock config={HOME_BLOCKS.steps}>
+            {(values) => (
+              <SectionHeading kicker={values.kicker} title={values.title} lead={values.lead} />
+            )}
+          </EditableBlock>
+
+          <EditableList
+            config={listConfig(LIST_KEYS.homeSteps)}
+            className={styles.steps}
+            wrapper={(node) => <li className={styles.step}>{node}</li>}
+          >
+            {(item, index) => (
+              <>
                 <span className={styles.stepNumber}>{String(index + 1).padStart(2, '0')}</span>
                 <div>
-                  <h3 className={styles.stepTitle}>{step.title}</h3>
-                  <p className={ui.muted}>{step.text}</p>
+                  <h3 className={styles.stepTitle}>{item.fields.title}</h3>
+                  <p className={ui.muted}>{item.fields.text}</p>
                 </div>
-              </li>
-            ))}
-          </ol>
+              </>
+            )}
+          </EditableList>
         </div>
       </section>
 
       <section className={styles.statsBand}>
-        <div className={cx(ui.container, styles.stats)}>
-          {home.stats.map((stat) => (
-            <div key={stat.label} className={styles.stat}>
-              <span className={styles.statValue}>
-                <StatValue
-                  value={stat.value}
-                  suffix={stat.suffix}
-                  suffixClassName={styles.statSuffix}
-                />
-              </span>
-              <span className={styles.statLabel}>{stat.label}</span>
-            </div>
-          ))}
+        {/* Сетку задаёт сам список: класс stats передаём ему, а не контейнеру */}
+        <div className={ui.container}>
+          <EditableList config={listConfig(LIST_KEYS.homeStats)} className={styles.stats}>
+            {(item) => (
+              <div className={styles.stat}>
+                <span className={styles.statValue}>
+                  <StatValue
+                    value={Number(item.fields.value) || 0}
+                    suffix={item.fields.suffix}
+                    suffixClassName={styles.statSuffix}
+                  />
+                </span>
+                <span className={styles.statLabel}>{item.fields.label}</span>
+              </div>
+            )}
+          </EditableList>
         </div>
       </section>
 
       <section className={ui.section}>
         <div className={ui.container}>
-          <SectionHeading kicker="Отзывы" title="Домашние машины, кофейни и офисы" align="center" />
-          <div className={styles.testimonials}>
-            {home.testimonials.map((item, index) => (
-              <Reveal key={item.name} delay={index * 90}>
+          <EditableBlock config={HOME_BLOCKS.testimonials}>
+            {(values) => (
+              <SectionHeading kicker={values.kicker} title={values.title} align="center" />
+            )}
+          </EditableBlock>
+
+          <EditableList
+            config={listConfig(LIST_KEYS.homeTestimonials)}
+            className={styles.testimonials}
+            wrapper={(node) => <>{node}</>}
+          >
+            {(item) => (
+              <Reveal>
                 <figure className={cx(ui.card, styles.testimonial)}>
-                  <blockquote className={styles.quote}>«{item.text}»</blockquote>
+                  <blockquote className={styles.quote}>«{item.fields.text}»</blockquote>
                   <figcaption className={styles.author}>
                     <span className={styles.avatar} aria-hidden="true">
-                      {item.initials}
+                      {item.fields.initials}
                     </span>
                     <span>
-                      <b>{item.name}</b>
-                      <em>{item.role}</em>
+                      <b>{item.fields.name}</b>
+                      <em>{item.fields.role}</em>
                     </span>
                   </figcaption>
                 </figure>
               </Reveal>
-            ))}
-          </div>
+            )}
+          </EditableList>
         </div>
       </section>
 
       <section className={styles.ctaBand}>
-        <div className={cx(ui.container, styles.cta)}>
-          <div>
-            <h2 className={cx(ui.title, styles.ctaTitle)}>
-              Машина встала в самый неподходящий день
-            </h2>
-            <p className={ui.lead}>
-              Опишите симптом по телефону — скажем, ремонт это или настройка, и когда сможем забрать
-              технику. Кофе и расходники привезём вместе с мастером.
-            </p>
-          </div>
-          <Link className={ui.btn} to={ROUTES.contacts.path}>
-            Оставить заявку
-          </Link>
-        </div>
+        <EditableBlock config={HOME_BLOCKS.cta}>
+          {(values) => (
+            <div className={cx(ui.container, styles.cta)}>
+              <div>
+                <h2 className={cx(ui.title, styles.ctaTitle)}>{values.title}</h2>
+                <p className={ui.lead}>{values.lead}</p>
+              </div>
+              <Link className={ui.btn} to={ROUTES.contacts.path}>
+                {values.action}
+              </Link>
+            </div>
+          )}
+        </EditableBlock>
       </section>
     </>
   )

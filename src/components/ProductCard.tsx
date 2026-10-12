@@ -1,82 +1,96 @@
 import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
-import { BADGE_LABELS, formatPrice, priceFor, type Product } from '../data/products'
+import { BADGE_LABELS } from '../data/badges'
 import { CupArt } from './CupArt'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './ProductCard.module.css'
 
+/**
+ * Карточка товара для подборки на главной.
+ *
+ * Данные приходят полями редактируемого списка (`home.featured`), а не из
+ * каталога: админ сам добавляет карточки, правит текст и цену. Каталог
+ * Данные карточек админ собирает сам — они лежат в базе, а не в каталоге.
+ *
+ * Кнопки покупки нет: сайт информационный, поэтому карточка ведёт на контакты.
+ */
+
+/** Подписи вокруг данных: это часть карточки, а не контент страницы */
+const LABELS = {
+  action: 'Уточнить наличие',
+  roastLabel: 'обжарка',
+  decafLabel: 'без кофеина',
+  warranty: 'Гарантия',
+  warrantyTail: 'сервис в Омске',
+  compatible: 'Подходит:',
+}
+
+/** Цвета рисованной «сцены», если у карточки нет фотографии */
+const DEFAULT_SCENE: [string, string] = ['#243b46', '#4f8a9c']
+
+/** Разбивает многострочное поле на пункты: пустые строки отбрасываем */
+const toList = (value: string | undefined): string[] =>
+  (value ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+
 interface ProductCardProps {
-  product: Product
-  /** Выбранный вариант: объём кофе или «1 шт» для техники */
-  variant: string
+  /** Поля карточки из списка `home.featured` */
+  fields: Record<string, string>
+  /** Количество кофейных делений: у техники и услуг не показываем */
+  roast?: number
   className?: string
 }
 
-const ROAST_SCALE = [1, 2, 3, 4, 5] as const
+export function ProductCard({ fields, roast, className }: ProductCardProps) {
+  const specs = toList(fields.specs)
+  const compatible = toList(fields.compatibleWith)
+  const badge = fields.badge ? BADGE_LABELS[fields.badge as keyof typeof BADGE_LABELS] : undefined
+  const price = Number(fields.price)
 
-/**
- * Карточка товара для подборки на главной. Компонент презентационный:
- * вариант передаёт страница.
- * Что показывать в теле — зависит от категории: у кофе это обжарка и
- * вкусовые ноты, у техники характеристики и гарантия, у расходников
- * совместимость и объём.
- * Кнопки покупки нет: сайт информационный, поэтому карточка ведёт на контакты.
- */
-export function ProductCard({ product, variant, className }: ProductCardProps) {
   return (
     <article className={cx(ui.card, styles.card, className)}>
       <div className={styles.art}>
-        {product.photo ? (
+        {fields.photo ? (
           <img
             className={styles.photo}
-            src={product.photo}
-            alt={product.name}
+            src={fields.photo}
+            alt={fields.name}
             loading="lazy"
             decoding="async"
           />
         ) : (
-          <CupArt scene={product.scene} />
+          <CupArt scene={DEFAULT_SCENE} />
         )}
-        {product.badge ? <span className={styles.badge}>{BADGE_LABELS[product.badge]}</span> : null}
-        {product.decaf ? <span className={styles.decaf}>без кофеина</span> : null}
+        {badge ? <span className={styles.badge}>{badge}</span> : null}
+        {fields.decaf ? <span className={styles.decaf}>{LABELS.decafLabel}</span> : null}
       </div>
 
       <div className={styles.body}>
         <header className={styles.head}>
-          <h3 className={styles.name}>{product.name}</h3>
+          <h3 className={styles.name}>{fields.name}</h3>
           <p className={styles.origin}>
-            {product.kind} · {product.subtitle}
+            {fields.kind}
+            {fields.subtitle ? ` · ${fields.subtitle}` : ''}
           </p>
         </header>
 
-        {product.roast ? (
-          <div className={styles.roast} title={`Обжарка поставщика: ${product.roast}/5`}>
-            <span className={styles.roastLabel}>обжарка</span>
+        {roast ? (
+          <div className={styles.roast} title={`Обжарка поставщика: ${roast}/5`}>
+            <span className={styles.roastLabel}>{LABELS.roastLabel}</span>
             <span className={styles.roastScale}>
-              {ROAST_SCALE.map((level) => (
-                <i
-                  key={level}
-                  className={cx(styles.roastDot, level <= product.roast! && styles.roastOn)}
-                />
+              {[1, 2, 3, 4, 5].map((level) => (
+                <i key={level} className={cx(styles.roastDot, level <= roast && styles.roastOn)} />
               ))}
             </span>
           </div>
         ) : null}
 
-        {product.notes?.length ? (
+        {specs.length ? (
           <ul className={styles.notes}>
-            {product.notes.map((note) => (
-              <li key={note} className={ui.chip}>
-                {note}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
-        {product.specs?.length ? (
-          <ul className={styles.notes}>
-            {product.specs.map((spec) => (
+            {specs.map((spec) => (
               <li key={spec} className={ui.chip}>
                 {spec}
               </li>
@@ -84,25 +98,31 @@ export function ProductCard({ product, variant, className }: ProductCardProps) {
           </ul>
         ) : null}
 
-        <p className={styles.text}>{product.description}</p>
+        {fields.description ? <p className={styles.text}>{fields.description}</p> : null}
 
-        {product.warranty ? (
-          <p className={styles.metaLine}>Гарантия {product.warranty} мес · сервис в Омске</p>
+        {fields.warranty ? (
+          <p className={styles.metaLine}>
+            {LABELS.warranty} {fields.warranty} мес · {LABELS.warrantyTail}
+          </p>
         ) : null}
 
-        {product.compatibleWith?.length ? (
+        {compatible.length ? (
           <p className={styles.metaLine}>
-            Подходит: {product.compatibleWith.join(', ')}
-            {product.volume ? ` · ${product.volume}` : ''}
+            {LABELS.compatible} {compatible.join(', ')}
+            {fields.volume ? ` · ${fields.volume}` : ''}
           </p>
         ) : null}
 
         <footer className={styles.footer}>
           <div className={styles.prices}>
-            <span className={ui.price}>{formatPrice(priceFor(product, variant))}</span>
+            <span className={ui.price}>
+              {Number.isFinite(price) && price > 0
+                ? `${new Intl.NumberFormat('ru-RU').format(price)} ₽`
+                : 'Цена по запросу'}
+            </span>
           </div>
           <Link className={cx(ui.btn, styles.add)} to={ROUTES.contacts.path}>
-            Уточнить наличие
+            {LABELS.action}
           </Link>
         </footer>
       </div>

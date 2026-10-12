@@ -42,15 +42,52 @@ CREATE INDEX IF NOT EXISTS site_requests_created_at_idx ON site_requests (create
  * заголовка не требует заводить записи для всего сайта.
  * key — устойчивый идентификатор блока («repair.hero»), по нему страница
  * находит свои тексты.
+ *
+ * Поля блока лежат в JSONB, а не в отдельных колонках: у разных блоков свой
+ * набор — у первого экрана ремонта это заголовок и подписи кнопок, у главной
+ * ещё и надзаголовок с подзаголовком. С колонками пришлось бы делать миграцию
+ * под каждый новый блок, а так состав полей задаётся в коде страницы.
  */
 CREATE TABLE IF NOT EXISTS site_content (
   key        TEXT PRIMARY KEY,
-  title      TEXT,
-  lead       TEXT,
-  action_one TEXT,
-  action_two TEXT,
+  fields     JSONB NOT NULL DEFAULT '{}'::jsonb,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+/*
+ * Если таблица уже была со старой схемой, CREATE TABLE её не тронет —
+ * колонку добавляем отдельно. Так миграция работает и на свежей базе,
+ * и на той, где тексты уже правили.
+ */
+ALTER TABLE site_content
+  ADD COLUMN IF NOT EXISTS fields JSONB NOT NULL DEFAULT '{}'::jsonb;
+
+/*
+ * Переносим тексты из прежней схемы с колонками title/lead/action_one/action_two.
+ * Выполняется один раз: после переноса колонки удаляются.
+ */
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'site_content' AND column_name = 'title'
+  ) THEN
+    UPDATE site_content
+    SET fields = jsonb_strip_nulls(jsonb_build_object(
+      'title', title,
+      'lead', lead,
+      'actionOne', action_one,
+      'actionTwo', action_two
+    ))
+    WHERE fields = '{}'::jsonb;
+
+    ALTER TABLE site_content
+      DROP COLUMN IF EXISTS title,
+      DROP COLUMN IF EXISTS lead,
+      DROP COLUMN IF EXISTS action_one,
+      DROP COLUMN IF EXISTS action_two;
+  END IF;
+END $$;
 
 /*
  * Служебные отметки: например, что стартовый набор карточек уже заливался.
@@ -99,6 +136,28 @@ CREATE TABLE IF NOT EXISTS partners (
 );
 
 CREATE INDEX IF NOT EXISTS partners_position_idx ON partners (position, id);
+
+/*
+ * Универсальные списки сайта: цифры, шаги работы, цены, вопросы, отзывы,
+ * принципы, команда — всё, что выводится повторяющимися карточками.
+ *
+ * Одна таблица на все списки, потому что набор полей у них разный и меняется
+ * от блока к блоку. kind — идентификатор списка из кода («repair.faq»),
+ * fields — сам элемент объектом. Так новый список не требует ни таблицы,
+ * ни миграции: достаточно описать поля на странице.
+ *
+ * Стартовые элементы заливаются один раз при первом обращении к списку:
+ * их присылает фронтенд, потому что значения по умолчанию живут в коде.
+ */
+CREATE TABLE IF NOT EXISTS site_items (
+  id         SERIAL PRIMARY KEY,
+  kind       TEXT NOT NULL,
+  position   INTEGER NOT NULL DEFAULT 0,
+  fields     JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS site_items_kind_idx ON site_items (kind, position, id);
 `
 
 /** Отметка о том, что стартовые карточки уже залиты */
@@ -188,10 +247,25 @@ export const getPool = (): Pool => {
 /**
  * Схему создаём при первом обращении: отдельная команда миграций для этого
  * проекта — лишний шаг, а SQL идемпотентный (IF NOT EXISTS).
+ *
+ * На Vercel функции выполняются в нескольких экземплярах сразу, поэтому
+ * миграцию закрываем блокировкой: иначе две копии одновременно полезут
+ * перекладывать колонки в site_content и одна из них упадёт.
  */
+const MIGRATION_LOCK = 918273645
+
 const ensureSchema = async (): Promise<void> => {
   const pool = getPool()
-  await pool.query(SCHEMA_SQL)
+  const client = await pool.connect()
+
+  try {
+    await client.query('SELECT pg_advisory_lock($1)', [MIGRATION_LOCK])
+    await client.query(SCHEMA_SQL)
+  } finally {
+    // Снимаем блокировку и в случае ошибки: иначе она провисит до конца сессии
+    await client.query('SELECT pg_advisory_unlock($1)', [MIGRATION_LOCK]).catch(() => undefined)
+    client.release()
+  }
 }
 
 export const ready = (): Promise<void> => {

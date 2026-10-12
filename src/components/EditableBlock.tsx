@@ -1,21 +1,11 @@
 import { observer } from 'mobx-react-lite'
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { useStore } from '../stores/context'
-import type { BlockDefaults } from '../stores/ContentStore'
-import type { EditableBlock as EditableBlockConfig } from '../data/editableBlocks'
+import type { BlockValues } from '../stores/ContentStore'
+import type { EditableBlock as EditableBlockConfig } from '../data/blockTypes'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './EditableBlock.module.css'
-
-/** Значения полей формы */
-type FormValues = Record<keyof BlockDefaults, string>
-
-const toFormValues = (values: BlockDefaults): FormValues => ({
-  title: values.title,
-  lead: values.lead,
-  actionOne: values.actionOne,
-  actionTwo: values.actionTwo,
-})
 
 interface EditableBlockProps {
   /** Описание блока: ключ, тексты по умолчанию и поля формы */
@@ -24,7 +14,7 @@ interface EditableBlockProps {
    * Как показать блок в обычном режиме. Функция получает актуальные тексты,
    * поэтому страница рисует свою разметку и не думает про редактирование.
    */
-  children: (values: BlockDefaults) => ReactNode
+  children: (values: BlockValues) => ReactNode
 }
 
 /**
@@ -47,19 +37,19 @@ export const EditableBlock = observer(function EditableBlock({
   const values = content.block(config.key, config.defaults)
 
   const [editing, setEditing] = useState(false)
-  const [form, setForm] = useState<FormValues>(() => toFormValues(values))
+  const [form, setForm] = useState<BlockValues>(values)
 
   // Править может только админ: остальным кнопки не показываем
   const canEdit = auth.isAdmin
 
   const startEditing = () => {
     // Берём актуальные значения: их могли изменить в другой вкладке
-    setForm(toFormValues(values))
+    setForm(values)
     setEditing(true)
     content.clearError()
   }
 
-  const set = (field: keyof FormValues, value: string) => {
+  const set = (field: string, value: string) => {
     setForm((previous) => ({ ...previous, [field]: value }))
   }
 
@@ -94,14 +84,14 @@ export const EditableBlock = observer(function EditableBlock({
           {field.multiline ? (
             <textarea
               className={cx(ui.input, styles.textarea)}
-              value={form[field.field]}
+              value={form[field.field] ?? ''}
               maxLength={field.max}
               onChange={(event) => set(field.field, event.target.value)}
             />
           ) : (
             <input
               className={ui.input}
-              value={form[field.field]}
+              value={form[field.field] ?? ''}
               maxLength={field.max}
               autoFocus={field.field === 'title'}
               onChange={(event) => set(field.field, event.target.value)}

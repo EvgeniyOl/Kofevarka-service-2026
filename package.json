@@ -20,6 +20,8 @@
     "db:wipe": "node scripts/reset-db.mjs",
     "db:directions": "node scripts/reset-directions.mjs",
     "db:partners": "node scripts/reset-partners.mjs",
+    "db:content": "node scripts/reset-content.mjs",
+    "db:lists": "node scripts/reset-lists.mjs",
     "check:api": "node scripts/check-api.mjs",
     "check:auth": "node scripts/check-auth.mjs",
     "check:crypto": "node --experimental-strip-types --no-warnings api/_lib/selftest.ts",

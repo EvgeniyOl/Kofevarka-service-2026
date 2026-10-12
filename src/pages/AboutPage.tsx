@@ -1,99 +1,150 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
+import { EditableBlock } from '../components/EditableBlock'
+import { EditableList } from '../components/EditableList'
 import { PartnersBlock } from '../components/PartnersBlock'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
 import { StatValue } from '../components/StatValue'
+import { ABOUT_BLOCKS } from '../data/blocks/about'
+import { LIST_KEYS, listConfig } from '../data/lists'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './AboutPage.module.css'
 
-/** О нас: история по годам, принципы, команда мастерской и партнёры */
+/**
+ * О нас: история по годам, принципы, команда мастерской и партнёры.
+ *
+ * Тексты и списки страницы правит админ прямо здесь: значения по умолчанию
+ * лежат в data/blocks/about.ts и data/lists.ts.
+ */
 export const AboutPage = observer(function AboutPage() {
-  const { about } = useStore()
+  const { items } = useStore()
+
+  /*
+   * История: карточка года берёт текст из того же списка, что и колонка годов, —
+   * иначе правка года не была бы видна на странице.
+   */
+  const timelineConfig = listConfig(LIST_KEYS.aboutTimeline)
+  const timeline = items.items(timelineConfig.key, timelineConfig.defaults)
+
+  /*
+   * Активный год — состояние интерфейса, а не данных: храним индекс прямо
+   * здесь. В сторе он опирался на встроенный список из четырёх записей,
+   * поэтому пятый добавленный год открыть было бы нельзя.
+   */
+  const [activeIndex, setActiveIndex] = useState(0)
+  const safeIndex = Math.min(activeIndex, Math.max(0, timeline.length - 1))
+  const activeEntry = timeline[safeIndex]
 
   return (
     <section className={cx(ui.container, styles.page)}>
-      <SectionHeading kicker="О нас" title="Мастерская, а не отдел маркетинга" lead={about.intro} />
+      <EditableBlock config={ABOUT_BLOCKS.hero}>
+        {(values) => (
+          <SectionHeading kicker={values.kicker} title={values.title} lead={values.lead} />
+        )}
+      </EditableBlock>
 
-      <div className={styles.numbers}>
-        {about.numbers.map((item, index) => (
-          <Reveal key={item.label} delay={index * 70}>
+      <EditableList config={listConfig(LIST_KEYS.aboutNumbers)} className={styles.numbers}>
+        {(item, index) => (
+          <Reveal delay={index * 70}>
             <div className={cx(ui.card, styles.number)}>
               <span className={styles.numberValue}>
                 <StatValue
-                  value={item.value}
-                  suffix={item.suffix}
+                  value={Number(item.fields.value) || 0}
+                  suffix={item.fields.suffix}
                   suffixClassName={styles.suffix}
                 />
               </span>
-              <span className={ui.muted}>{item.label}</span>
+              <span className={ui.muted}>{item.fields.label}</span>
             </div>
           </Reveal>
-        ))}
-      </div>
+        )}
+      </EditableList>
 
       <div className={styles.timelineBlock}>
-        <h3 className={styles.blockTitle}>Как мы к этому пришли</h3>
-        <div className={styles.timeline}>
-          <ol className={styles.years}>
-            {about.timeline.map((entry, index) => (
-              <li key={entry.year}>
-                <button
-                  type="button"
-                  className={cx(styles.year, about.activeYearIndex === index && styles.yearActive)}
-                  onClick={() => about.setActiveYear(index)}
-                >
-                  <span className={styles.yearDot} />
-                  {entry.year}
-                </button>
-              </li>
-            ))}
-          </ol>
+        <EditableBlock config={ABOUT_BLOCKS.timelineTitle}>
+          {(values) => <h3 className={styles.blockTitle}>{values.title}</h3>}
+        </EditableBlock>
 
-          <article className={cx(ui.card, styles.entry)} key={about.activeEntry.year}>
-            <span className={styles.entryYear}>{about.activeEntry.year}</span>
-            <h4 className={styles.entryTitle}>{about.activeEntry.title}</h4>
-            <p className={ui.muted}>{about.activeEntry.text}</p>
-          </article>
+        <div className={styles.timeline}>
+          <EditableList
+            config={timelineConfig}
+            className={styles.years}
+            wrapper={(node) => <li>{node}</li>}
+          >
+            {(item, index) => (
+              <button
+                type="button"
+                className={cx(styles.year, safeIndex === index && styles.yearActive)}
+                onClick={() => setActiveIndex(index)}
+              >
+                <span className={styles.yearDot} />
+                {item.fields.year}
+              </button>
+            )}
+          </EditableList>
+
+          {activeEntry ? (
+            // Ключ по году перезапускает появление карточки при смене года
+            <article className={cx(ui.card, styles.entry)} key={activeEntry.fields.year}>
+              <span className={styles.entryYear}>{activeEntry.fields.year}</span>
+              <h4 className={styles.entryTitle}>{activeEntry.fields.title}</h4>
+              <p className={ui.muted}>{activeEntry.fields.text}</p>
+            </article>
+          ) : null}
         </div>
       </div>
 
       <div className={styles.grid}>
         <div>
-          <h3 className={styles.blockTitle}>Принципы, которые не обсуждаются</h3>
-          <ul className={styles.principles}>
-            {about.principles.map((principle, index) => (
-              <Reveal key={principle} delay={index * 60}>
-                <li className={styles.principle}>
-                  <span aria-hidden="true">✓</span>
-                  {principle}
-                </li>
-              </Reveal>
-            ))}
-          </ul>
+          <EditableBlock config={ABOUT_BLOCKS.principlesTitle}>
+            {(values) => <h3 className={styles.blockTitle}>{values.title}</h3>}
+          </EditableBlock>
+
+          {/*
+            Класс карточки стоит внутри children: обёртку wrapper компонент
+            списка применяет только в режиме правки, а рамка и отступы нужны
+            всем посетителям. Wrapper добавляет только семантичный li.
+          */}
+          <EditableList
+            config={listConfig(LIST_KEYS.aboutPrinciples)}
+            className={styles.principles}
+            wrapper={(node) => <li>{node}</li>}
+          >
+            {(item) => (
+              <div className={styles.principle}>
+                <span aria-hidden="true">✓</span>
+                {item.fields.text}
+              </div>
+            )}
+          </EditableList>
         </div>
 
         <div>
-          <h3 className={styles.blockTitle}>Кто ремонтирует</h3>
-          <div className={styles.team}>
-            {about.team.map((member, index) => (
-              <Reveal key={member.name} delay={index * 70}>
+          <EditableBlock config={ABOUT_BLOCKS.teamTitle}>
+            {(values) => <h3 className={styles.blockTitle}>{values.title}</h3>}
+          </EditableBlock>
+
+          <EditableList config={listConfig(LIST_KEYS.aboutTeam)} className={styles.team}>
+            {(item, index) => (
+              <Reveal delay={index * 70}>
                 <article className={cx(ui.card, styles.member)}>
                   <span className={styles.avatar} aria-hidden="true">
-                    {member.initials}
+                    {item.fields.initials}
                   </span>
                   <div>
-                    <h4 className={styles.memberName}>{member.name}</h4>
-                    <span className={styles.memberRole}>{member.role}</span>
-                    <p className={ui.muted}>{member.text}</p>
+                    <h4 className={styles.memberName}>{item.fields.name}</h4>
+                    <span className={styles.memberRole}>{item.fields.role}</span>
+                    <p className={ui.muted}>{item.fields.text}</p>
                   </div>
                 </article>
               </Reveal>
-            ))}
-          </div>
+            )}
+          </EditableList>
         </div>
       </div>
 
@@ -102,26 +153,30 @@ export const AboutPage = observer(function AboutPage() {
         и удаляет карточки прямо здесь — см. components/PartnersBlock.tsx
       */}
       <div className={styles.partnersBlock}>
-        <h3 className={styles.blockTitle}>С кем работаем</h3>
-        <p className={cx(ui.muted, styles.partnersLead)}>
-          Берём зерно у обжарщиков, в технике которых разбираемся: ставим его в аппараты после
-          настройки помола и следим, чтобы вкус не менялся от партии к партии.
-        </p>
+        <EditableBlock config={ABOUT_BLOCKS.partners}>
+          {(values) => (
+            <>
+              <h3 className={styles.blockTitle}>{values.title}</h3>
+              <p className={cx(ui.muted, styles.partnersLead)}>{values.lead}</p>
+            </>
+          )}
+        </EditableBlock>
         <PartnersBlock />
       </div>
 
-      <div className={cx(ui.card, styles.cta)}>
-        <div>
-          <h3 className={cx(ui.title, styles.ctaTitle)}>Привозите машину — посмотрим при вас</h3>
-          <p className={ui.lead}>
-            Мастерская на Декабристов, 116/1: диагностика за день, смета до работ и гарантия
-            полгода. Если ехать неудобно — вызовем мастера или заберём технику сами.
-          </p>
-        </div>
-        <Link className={ui.btn} to={ROUTES.repair.path}>
-          Что мы ремонтируем
-        </Link>
-      </div>
+      <EditableBlock config={ABOUT_BLOCKS.cta}>
+        {(values) => (
+          <div className={cx(ui.card, styles.cta)}>
+            <div>
+              <h3 className={cx(ui.title, styles.ctaTitle)}>{values.title}</h3>
+              <p className={ui.lead}>{values.lead}</p>
+            </div>
+            <Link className={ui.btn} to={ROUTES.repair.path}>
+              {values.action}
+            </Link>
+          </div>
+        )}
+      </EditableBlock>
     </section>
   )
 })

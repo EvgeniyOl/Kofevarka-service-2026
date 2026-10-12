@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useState, type FormEvent } from 'react'
 import { MAX_DIRECTIONS, emptyDirection, type DirectionInput } from '../data/directions'
+import { useConfirmDelete } from '../hooks/useConfirmDelete'
 import { useStore } from '../stores/context'
 import type { Direction } from '../api/client'
 import { Reveal } from './Reveal'
@@ -155,13 +156,18 @@ export const DirectionCard = observer(function DirectionCard({
 }: DirectionCardProps) {
   const { directions, auth } = useStore()
   const [editing, setEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const canEdit = auth.isAdmin
 
+  const remove = async () => {
+    await directions.remove(direction.id)
+  }
+
+  const { armed, request, setCard, disarm } = useConfirmDelete(remove)
+
   const startEditing = () => {
     directions.clearError()
-    setConfirmDelete(false)
+    disarm()
     setEditing(true)
   }
 
@@ -169,15 +175,6 @@ export const DirectionCard = observer(function DirectionCard({
     const ok = await directions.update(direction.id, values)
     if (ok) setEditing(false)
     return ok
-  }
-
-  const remove = async () => {
-    // Удаляем со второго нажатия: случайный клик не должен сносить карточку
-    if (!confirmDelete) {
-      setConfirmDelete(true)
-      return
-    }
-    await directions.remove(direction.id)
   }
 
   /*
@@ -203,7 +200,7 @@ export const DirectionCard = observer(function DirectionCard({
 
   return (
     <Reveal className={styles.wrap} delay={delay}>
-      <article className={cx(ui.card, styles.card)}>
+      <article className={cx(ui.card, styles.card)} ref={setCard}>
         {canEdit ? (
           <div className={styles.toolbar}>
             <button type="button" className={styles.action} onClick={startEditing}>
@@ -212,10 +209,9 @@ export const DirectionCard = observer(function DirectionCard({
             <button
               type="button"
               className={cx(styles.action, styles.actionDanger)}
-              onClick={() => void remove()}
-              onBlur={() => setConfirmDelete(false)}
+              onClick={request}
             >
-              {confirmDelete ? 'Точно удалить?' : 'Удалить'}
+              {armed ? 'Точно удалить?' : 'Удалить'}
             </button>
           </div>
         ) : null}

@@ -65,27 +65,6 @@
   font-weight: 400;
 }
 
-/* Подписка: 2 кг кофе в месяц плюс бесплатное обслуживание машины */
-.plan {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 24px;
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  background:
-    radial-gradient(120% 130% at 100% 0%, rgba(224, 164, 94, 0.16), transparent 60%),
-    rgba(224, 164, 94, 0.05);
-}
-
-.plan span[class*='chip'] {
-  align-self: flex-start;
-}
-
-.plan a {
-  align-self: flex-start;
-  margin-top: 4px;
-}
-
 /* Порядок оформления заказа: онлайн-оплаты нет, поэтому кнопки ведут к связи */
 .order {
   display: flex;

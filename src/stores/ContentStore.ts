@@ -5,24 +5,18 @@
  * находит свои тексты, а в базе хранится только то, что админ менял.
  * Если записи нет, используется текст из кода: так правка одного заголовка
  * не требует дублировать в базе весь контент сайта.
+ *
+ * Набор полей у каждого блока свой и задаётся в data/blocks/*.ts,
+ * поэтому здесь значения лежат обычным объектом, а не фиксированным списком.
  */
 import { makeAutoObservable, runInAction } from 'mobx'
-import { api, ApiError, type SiteContent } from '../api/client'
+import { api, ApiError } from '../api/client'
 
-/** Что можно переопределить в блоке */
-export interface BlockText {
-  title?: string
-  lead?: string
-  /** Первая кнопка блока: «Позвонить» или похожая */
-  actionOne?: string
-  /** Вторая кнопка: «Оставить заявку» или похожая */
-  actionTwo?: string
-}
-
-/** Тексты по умолчанию: то, что видно, пока админ ничего не менял */
-export type BlockDefaults = Required<BlockText>
+/** Тексты блока: имя поля — значение */
+export type BlockValues = Record<string, string>
 
 export const BLOCK_KEYS = {
+  homeHero: 'home.hero',
   repairHero: 'repair.hero',
 } as const
 
@@ -32,7 +26,7 @@ export const BLOCK_KEYS = {
  */
 export class ContentStore {
   /** Сохранённые в базе блоки, разложенные по ключу */
-  private saved = new Map<string, SiteContent>()
+  private saved = new Map<string, BlockValues>()
   loading = true
   error: string | null = null
 
@@ -44,7 +38,7 @@ export class ContentStore {
     try {
       const { blocks } = await api.content()
       runInAction(() => {
-        this.saved = new Map(blocks.map((block) => [block.key, block]))
+        this.saved = new Map(blocks.map((block) => [block.key, block.fields]))
         this.error = null
       })
     } catch (error) {
@@ -67,30 +61,25 @@ export class ContentStore {
 
   /**
    * Тексты блока: сохранённые значения поверх значений из кода.
-   * Пустое поле в базе не хранится, поэтому подстановка безопасна.
+   * Пустые поля в базе не хранятся, поэтому подстановка безопасна.
    */
-  block(key: string, defaults: BlockDefaults): BlockDefaults {
+  block(key: string, defaults: BlockValues): BlockValues {
     const saved = this.saved.get(key)
     if (!saved) return defaults
 
-    return {
-      title: saved.title ?? defaults.title,
-      lead: saved.lead ?? defaults.lead,
-      actionOne: saved.actionOne ?? defaults.actionOne,
-      actionTwo: saved.actionTwo ?? defaults.actionTwo,
-    }
+    return { ...defaults, ...saved }
   }
 
   /** Сохранение правки из блока: возвращает true, если сервер принял текст */
-  async save(key: string, values: BlockText): Promise<boolean> {
+  async save(key: string, values: BlockValues): Promise<boolean> {
     this.error = null
 
     try {
-      const { block } = await api.saveContent({ key, ...values })
+      const { block } = await api.saveContent({ key, fields: values })
 
       runInAction(() => {
         // Пустой ответ значит, что все поля очистили и блок вернулся к тексту из кода
-        if (block) this.saved.set(key, block)
+        if (block) this.saved.set(key, block.fields)
         else this.saved.delete(key)
       })
       return true
