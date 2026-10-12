@@ -158,6 +158,19 @@ CREATE TABLE IF NOT EXISTS site_items (
 );
 
 CREATE INDEX IF NOT EXISTS site_items_kind_idx ON site_items (kind, position, id);
+
+/*
+ * Неудачные попытки входа: защита от перебора пароля.
+ * Ключ — «адрес клиента|почта», count — сколько раз ошиблись,
+ * reset_at — когда счётчик обнулится сам.
+ */
+CREATE TABLE IF NOT EXISTS auth_attempts (
+  key      TEXT PRIMARY KEY,
+  count    INTEGER NOT NULL DEFAULT 0,
+  reset_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS auth_attempts_reset_idx ON auth_attempts (reset_at);
 `
 
 /** Отметка о том, что стартовые карточки уже залиты */

@@ -14,6 +14,7 @@ import {
   HttpError,
 } from '../_lib/http.js'
 import { hashPassword } from '../_lib/password.js'
+import { checkAttempts, clearAttempts, registerFailure } from '../_lib/rateLimit.js'
 import { createSessionToken, setSessionCookie } from '../_lib/session.js'
 import { toPublicUser, type Role, type UserRow } from '../_lib/types.js'
 
@@ -36,8 +37,19 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const email = requireEmail(body.email)
     const password = requirePassword(body.password)
 
+    // Регистрацию тоже притормаживаем: иначе через неё подбирают,
+    // какие адреса уже заняты, и плодят аккаунты пачками
+    const attempts = await checkAttempts(req, email)
+    if (attempts.blocked) {
+      throw new HttpError(
+        429,
+        `Слишком много попыток. Попробуйте через ${attempts.minutesLeft} мин.`,
+      )
+    }
+
     const existing = await query<{ id: number }>('SELECT id FROM users WHERE email = $1', [email])
     if (existing.length) {
+      await registerFailure(req, email)
       throw new HttpError(409, 'Такой адрес уже зарегистрирован — войдите')
     }
 
@@ -50,6 +62,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
        RETURNING *`,
       [email, name, role, await hashPassword(password)],
     )
+
+    await clearAttempts(req, email)
 
     const user = toPublicUser(rows[0])
     setSessionCookie(res, createSessionToken(user.id))
