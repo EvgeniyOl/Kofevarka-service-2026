@@ -38,7 +38,7 @@ export const AdminPage = observer(function AdminPage() {
       <SectionHeading
         kicker="Админка"
         title="Заявки и пользователи"
-        lead="Заявки приходят из формы на странице контактов. Роли меняются здесь же: администратор видит этот раздел, клиент — только свои заявки."
+        lead="Заявки приходят из формы на странице контактов. Раздел открыт только администратору — им становится тот, кто зарегистрировался первым."
       />
 
       <div className={styles.tabs}>
@@ -117,20 +117,20 @@ export const AdminPage = observer(function AdminPage() {
               <span className={styles.muted}>{user.email}</span>
               <span className={styles.muted}>{formatDate(user.createdAt)}</span>
               <span>
-                <button
-                  type="button"
-                  className={styles.role}
-                  /* Себе роль не меняем: сервер это тоже запрещает */
-                  disabled={user.id === auth.user?.id}
+                {/*
+                  Роль — просто подпись, а не кнопка: администратор в проекте
+                  один и назначается при регистрации. Это же видно и в подсказке.
+                */}
+                <span
+                  className={cx(styles.role, user.role === 'admin' && styles.roleAdmin)}
                   title={
-                    user.id === auth.user?.id ? 'Свою роль изменить нельзя' : 'Переключить роль'
-                  }
-                  onClick={() =>
-                    void auth.setRole(user.id, user.role === 'admin' ? 'client' : 'admin')
+                    user.role === 'admin'
+                      ? 'Администратор — тот, кто зарегистрировался первым'
+                      : 'Клиент: может оставить заявку и видеть её статус'
                   }
                 >
                   {user.role === 'admin' ? 'Администратор' : 'Клиент'}
-                </button>
+                </span>
               </span>
             </div>
           ))}

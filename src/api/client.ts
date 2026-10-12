@@ -5,9 +5,9 @@
  * credentials: 'include' обязателен: сессия лежит в httpOnly-cookie, и без
  * этого браузер не отправит её на другие страницы сайта.
  */
-import type { PublicUser, SiteRequest, RequestStatus, Role } from '../../api/_lib/types'
+import type { PublicUser, SiteRequest, RequestStatus } from '../../api/_lib/types'
 
-export type { PublicUser, SiteRequest, RequestStatus, Role }
+export type { PublicUser, SiteRequest, RequestStatus }
 
 /** Ошибка с текстом от сервера: показываем её прямо в форме */
 export class ApiError extends Error {
@@ -82,11 +82,9 @@ export const api = {
   /** Заявки для админа */
   requests: () => request<{ requests: SiteRequest[] }>('/requests'),
 
+  /**
+   * Список пользователей для админа.
+   * Смены роли здесь нет: администратор один и назначается при регистрации.
+   */
   users: () => request<{ users: PublicUser[] }>('/users'),
-
-  setRole: (id: number, role: Role) =>
-    request<{ user: PublicUser }>('/users', {
-      method: 'PATCH',
-      body: JSON.stringify({ id, role }),
-    }),
 }

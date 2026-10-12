@@ -41,7 +41,7 @@ export const RequireAuth = observer(function RequireAuth({
       <section className={cx(ui.container, styles.denied)}>
         <h1 className={ui.title}>Раздел только для администратора</h1>
         <p className={ui.lead}>
-          Ваш аккаунт — клиентский. Если доступ нужен, попросите администратора выдать роль.
+          Роли выдаются один раз: администратором становится тот, кто зарегистрировался первым.
         </p>
       </section>
     )

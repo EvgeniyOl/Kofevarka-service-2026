@@ -203,43 +203,33 @@ check(
   messages.includes('Заявка от гостя') && messages.includes('Заявка от вошедшего'),
 )
 
-// — 10. Смена роли админом —
+// — 10. Роли не меняются: администратор один —
+// Ручки для смены роли нет вовсе, поэтому PATCH должен отвечать 405.
 const clientId = second.payload?.user?.id
 const promote = await call('/api/users', {
   method: 'PATCH',
   body: { id: clientId, role: 'admin' },
   cookie: adminCookie,
 })
-check(
-  'админ может выдать роль администратора',
-  promote.status === 200 && promote.payload?.user?.role === 'admin',
-  `HTTP ${promote.status}`,
-)
+check('смена роли недоступна даже админу', promote.status === 405, `HTTP ${promote.status}`)
 
-// — 11. Себе роль снять нельзя —
-const demoteSelf = await call('/api/users', {
-  method: 'PATCH',
-  body: { id: first.payload?.user?.id, role: 'client' },
-  cookie: adminCookie,
-})
-check('нельзя снять роль с себя', demoteSelf.status === 400, `HTTP ${demoteSelf.status}`)
-
-// — 12. Клиент не может менять роли —
-// Проверяем на третьем пользователе: второго мы только что повысили,
-// поэтому его cookie теперь соответствует администратору
+// — 11. Второй администратор не появляется —
 const third = await call('/api/auth/register', {
   method: 'POST',
   body: { name: 'Третий', email: thirdEmail, password },
 })
 createdEmails.push(thirdEmail)
-const clientPatch = await call('/api/users', {
-  method: 'PATCH',
-  body: { id: third.payload?.user?.id, role: 'admin' },
-  cookie: third.cookie,
-})
-check('клиент не может менять роли', clientPatch.status === 403, `HTTP ${clientPatch.status}`)
+check(
+  'третий пользователь тоже клиент — админ ровно один',
+  third.payload?.user?.role === 'client',
+  `роль: ${third.payload?.user?.role}`,
+)
 
-// — 13. Выход стирает сессию —
+const allUsers = await call('/api/users', { cookie: adminCookie })
+const admins = (allUsers.payload?.users ?? []).filter((user) => user.role === 'admin')
+check('в базе ровно один администратор', admins.length === 1, `их: ${admins.length}`)
+
+// — 12. Выход стирает сессию —
 const logout = await call('/api/auth/logout', { method: 'POST', cookie: adminCookie })
 check('выход отвечает успехом', logout.status === 200)
 check(
@@ -248,7 +238,7 @@ check(
   logout.rawCookie.slice(0, 70),
 )
 
-// — 14. Поддельная cookie не даёт доступа —
+// — 13. Поддельная cookie не даёт доступа —
 // В заголовке cookie допустимы только ASCII-символы, поэтому подпись «поддельная»
 const forged = await call('/api/users', { cookie: 'kofevarka_session=ZmFrZQ.forged' })
 check('поддельная сессия не даёт доступ', forged.status === 401, `HTTP ${forged.status}`)

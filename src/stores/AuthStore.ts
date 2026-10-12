@@ -1,12 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import {
-  api,
-  ApiError,
-  type PublicUser,
-  type Role,
-  type SiteRequest,
-  type RequestStatus,
-} from '../api/client'
+import { api, ApiError, type PublicUser, type SiteRequest, type RequestStatus } from '../api/client'
 
 export type { RequestStatus }
 
@@ -126,19 +119,6 @@ export class AuthStore {
     } finally {
       runInAction(() => {
         this.usersLoading = false
-      })
-    }
-  }
-
-  async setRole(id: number, role: Role): Promise<void> {
-    try {
-      const { user } = await api.setRole(id, role)
-      runInAction(() => {
-        this.users = this.users.map((item) => (item.id === user.id ? user : item))
-      })
-    } catch (error) {
-      runInAction(() => {
-        this.error = error instanceof ApiError ? error.message : 'Не удалось изменить роль'
       })
     }
   }
