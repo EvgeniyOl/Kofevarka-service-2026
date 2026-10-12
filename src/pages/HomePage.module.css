@@ -66,27 +66,6 @@
   gap: 12px;
 }
 
-.heroFacts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin: 10px 0 0;
-  padding-top: 22px;
-  border-top: 1px solid var(--line);
-}
-
-.heroFacts dt {
-  font-size: 0.74rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.heroFacts dd {
-  margin: 4px 0 0;
-  font-size: 0.98rem;
-}
-
 .heroArt {
   position: relative;
   animation: riseIn 1.1s var(--ease) 0.15s both;
@@ -401,15 +380,6 @@
 }
 
 @media (max-width: 640px) {
-  /*
-   * На телефоне факты из первого экрана убираем: они дублируют то, что ниже
-   * рассказано подробно, а на маленьком экране занимают целый блок и отодвигают
-   * кнопки. На планшете и компьютере блок остаётся.
-   */
-  .heroFacts {
-    display: none;
-  }
-
   /* На узком экране плашки не выносим за кадр: иначе они обрезаются краем окна */
   .floatCard {
     padding: 8px 12px 9px;

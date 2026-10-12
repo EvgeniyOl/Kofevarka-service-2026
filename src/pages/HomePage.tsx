@@ -7,7 +7,6 @@ import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
 import { StatValue } from '../components/StatValue'
 import { CONTACT_PHONE, CONTACT_PHONE_HREF } from '../data/contacts'
-import { formatPrice, priceFor } from '../data/products'
 import { useStore } from '../stores/context'
 import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
@@ -16,10 +15,6 @@ import styles from './HomePage.module.css'
 /** Главная: ремонт кофемашин и кофе — герой, избранное, порядок работ, цифры, отзывы */
 export const HomePage = observer(function HomePage() {
   const { home } = useStore()
-  const cheapest = home.featured.reduce(
-    (min, product) => Math.min(min, priceFor(product, '1')),
-    Number.POSITIVE_INFINITY,
-  )
 
   return (
     <>
@@ -43,21 +38,6 @@ export const HomePage = observer(function HomePage() {
                 {CONTACT_PHONE}
               </a>
             </div>
-
-            <dl className={styles.heroFacts}>
-              <div>
-                <dt>Диагностика</dt>
-                <dd>за 1 день</dd>
-              </div>
-              <div>
-                <dt>Цена от</dt>
-                <dd>{formatPrice(cheapest === Number.POSITIVE_INFINITY ? 640 : cheapest)}</dd>
-              </div>
-              <div>
-                <dt>Доставка</dt>
-                <dd>по Омску, от 3 кг — бесплатно</dd>
-              </div>
-            </dl>
           </div>
 
           <div className={styles.heroArt}>
