@@ -250,7 +250,17 @@ export const getPool = (): Pool => {
       // Neon и большинство облачных Postgres требуют TLS, но с самоподписанным
       // сертификатом в цепочке — поэтому rejectUnauthorized: false
       ssl: url.includes('localhost') ? undefined : { rejectUnauthorized: false },
-      max: 3,
+      /*
+       * Каждая функция Vercel — отдельный процесс со своим пулом, поэтому
+       * держим по одному соединению: иначе десяток параллельных запросов
+       * съедает лимит подключений Neon и часть запросов встаёт в очередь.
+       */
+      max: 1,
+      // Не ждём соединение бесконечно: лучше честная ошибка, чем зависший ответ
+      connectionTimeoutMillis: 8000,
+      idleTimeoutMillis: 10_000,
+      // И не даём одному запросу держать соединение дольше десяти секунд
+      statement_timeout: 10_000,
     })
   }
 
@@ -259,26 +269,17 @@ export const getPool = (): Pool => {
 
 /**
  * Схему создаём при первом обращении: отдельная команда миграций для этого
- * проекта — лишний шаг, а SQL идемпотентный (IF NOT EXISTS).
+ * проекта — лишний шаг, а SQL идемпотентный (IF NOT EXISTS, DROP ... IF EXISTS).
  *
- * На Vercel функции выполняются в нескольких экземплярах сразу, поэтому
- * миграцию закрываем блокировкой: иначе две копии одновременно полезут
- * перекладывать колонки в site_content и одна из них упадёт.
+ * Блокировку здесь не берём намеренно. `pg_advisory_lock` — вызов
+ * блокирующий: на Vercel функции выполняются в нескольких экземплярах сразу,
+ * и если один из них не успеет отпустить блокировку (таймаут функции,
+ * замороженное соединение в пуле), все остальные повиснут навсегда —
+ * ровно это и случилось однажды с продом. Идемпотентность важнее: повторный
+ * прогон миграции ничего не портит, а зависший API не лечится ничем.
  */
-const MIGRATION_LOCK = 918273645
-
 const ensureSchema = async (): Promise<void> => {
-  const pool = getPool()
-  const client = await pool.connect()
-
-  try {
-    await client.query('SELECT pg_advisory_lock($1)', [MIGRATION_LOCK])
-    await client.query(SCHEMA_SQL)
-  } finally {
-    // Снимаем блокировку и в случае ошибки: иначе она провисит до конца сессии
-    await client.query('SELECT pg_advisory_unlock($1)', [MIGRATION_LOCK]).catch(() => undefined)
-    client.release()
-  }
+  await getPool().query(SCHEMA_SQL)
 }
 
 export const ready = (): Promise<void> => {
