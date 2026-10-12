@@ -48,10 +48,6 @@
   color: var(--accent);
 }
 
-.actionGhost {
-  color: var(--muted);
-}
-
 /* Когда блок правится, обводим его: видно, что именно меняется */
 .editing {
   display: flex;

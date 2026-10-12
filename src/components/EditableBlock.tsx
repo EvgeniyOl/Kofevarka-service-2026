@@ -45,7 +45,6 @@ export const EditableBlock = observer(function EditableBlock({
 
   // Текущие тексты: сохранённые в базе поверх значений из кода
   const values = content.block(config.key, config.defaults)
-  const hasSaved = Boolean(content.savedFor(config.key))
 
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState<FormValues>(() => toFormValues(values))
@@ -69,15 +68,6 @@ export const EditableBlock = observer(function EditableBlock({
     if (await content.save(config.key, form)) setEditing(false)
   }
 
-  /** Возврат к текстам из кода: сервер удаляет запись блока */
-  const reset = async () => {
-    const ok = await content.save(config.key, {})
-    if (ok) {
-      setForm(toFormValues(config.defaults))
-      setEditing(false)
-    }
-  }
-
   // Обычный режим: посетитель видит блок как есть
   if (!editing) {
     return (
@@ -87,15 +77,6 @@ export const EditableBlock = observer(function EditableBlock({
             <button type="button" className={styles.action} onClick={startEditing}>
               Изменить
             </button>
-            {hasSaved ? (
-              <button
-                type="button"
-                className={cx(styles.action, styles.actionGhost)}
-                onClick={() => void reset()}
-              >
-                Вернуть исходный текст
-              </button>
-            ) : null}
           </div>
         ) : null}
 

@@ -60,11 +60,6 @@ export class ContentStore {
     }
   }
 
-  /** Что сохранено для блока — нужно форме в админке */
-  savedFor(key: string): SiteContent | undefined {
-    return this.saved.get(key)
-  }
-
   /** Убрать сообщение об ошибке: вызывается при открытии формы */
   clearError(): void {
     this.error = null
@@ -86,7 +81,7 @@ export class ContentStore {
     }
   }
 
-  /** Сохранение из админки: возвращает true, если сервер принял правку */
+  /** Сохранение правки из блока: возвращает true, если сервер принял текст */
   async save(key: string, values: BlockText): Promise<boolean> {
     this.error = null
 
