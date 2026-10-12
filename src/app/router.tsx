@@ -8,7 +8,6 @@ import { DeliveryPage } from '../pages/DeliveryPage'
 import { HomePage } from '../pages/HomePage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { RepairPage } from '../pages/RepairPage'
-import { SubscriptionPage } from '../pages/SubscriptionPage'
 import { Layout } from './Layout'
 import { ROUTES } from './routes'
 
@@ -24,7 +23,6 @@ export function AppRouter() {
         <Route element={<Layout />}>
           <Route path={ROUTES.home.path} element={<HomePage />} />
           <Route path={ROUTES.repair.path} element={<RepairPage />} />
-          <Route path={ROUTES.subscription.path} element={<SubscriptionPage />} />
           <Route path={ROUTES.about.path} element={<AboutPage />} />
           <Route path={ROUTES.delivery.path} element={<DeliveryPage />} />
           <Route path={ROUTES.contacts.path} element={<ContactsPage />} />

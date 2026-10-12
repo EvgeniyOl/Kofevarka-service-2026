@@ -1,24 +1,21 @@
-import { AboutStore } from './AboutStore'
 import { AuthStore } from './AuthStore'
 import { ContactsStore } from './ContactsStore'
 import { ContentStore } from './ContentStore'
 import { DeliveryStore } from './DeliveryStore'
 import { DirectionsStore } from './DirectionsStore'
-import { HomeStore } from './HomeStore'
+import { ItemsStore } from './ItemsStore'
 import { PartnersStore } from './PartnersStore'
-import { RepairStore } from './RepairStore'
-import { SubscriptionStore } from './SubscriptionStore'
 
 /**
  * Корневой стор приложения: у каждого раздела свой стор.
  * Корзины и витрины нет — сайт информационный, заказы принимаем
  * по телефону и заявкой.
+ *
+ * Данные страниц «Ремонт», «О нас» и «Доставка» живут не в сторах, а
+ * в редактируемых списках и блоках: их правит админ прямо на странице.
+ * Сторы этих разделов поэтому не нужны — состояние интерфейса держат они сами.
  */
 export class RootStore {
-  readonly home: HomeStore
-  readonly repair: RepairStore
-  readonly subscription: SubscriptionStore
-  readonly about: AboutStore
   readonly delivery: DeliveryStore
   readonly contacts: ContactsStore
   readonly auth: AuthStore
@@ -28,18 +25,17 @@ export class RootStore {
   readonly directions: DirectionsStore
   /** Партнёры: логотипы и подписи на странице «О нас» */
   readonly partners: PartnersStore
+  /** Списки сайта: цифры, шаги, цены, вопросы, отзывы, принципы, команда */
+  readonly items: ItemsStore
 
   constructor() {
-    this.home = new HomeStore()
-    this.repair = new RepairStore()
-    this.subscription = new SubscriptionStore()
-    this.about = new AboutStore()
     this.delivery = new DeliveryStore()
     this.contacts = new ContactsStore()
     this.auth = new AuthStore()
     this.content = new ContentStore()
     this.directions = new DirectionsStore()
     this.partners = new PartnersStore()
+    this.items = new ItemsStore()
   }
 }
 

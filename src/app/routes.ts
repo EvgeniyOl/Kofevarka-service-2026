@@ -28,12 +28,6 @@ export const ROUTES = {
     description:
       'Диагностика за день, запчасти на складе, выезд мастера и гарантия 6 месяцев на работы.',
   },
-  subscription: {
-    path: '/subscription',
-    label: 'Подписка',
-    title: 'Подписка на кофе — Kofevarka Service',
-    description: 'Кофе приезжает сам: выбираете объём, помол и ритм доставки.',
-  },
   about: {
     path: '/about',
     label: 'О нас',
@@ -78,12 +72,11 @@ export const ROUTES = {
 
 /**
  * Разделы для меню. Витрины и корзины в проекте нет: сайт рассказывает
- * о ремонте и подписке, а заказы принимаем по телефону и заявкой.
+ * о ремонте и кофе, а заказы принимаем по телефону и заявкой.
  */
 export const NAV_ROUTES: RouteMeta[] = [
   ROUTES.home,
   ROUTES.repair,
-  ROUTES.subscription,
   ROUTES.about,
   ROUTES.delivery,
   ROUTES.contacts,
