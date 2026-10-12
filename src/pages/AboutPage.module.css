@@ -38,6 +38,16 @@
   font-weight: 400;
 }
 
+/* Блок партнёров: подводка и сетка логотипов */
+.partnersBlock {
+  margin-bottom: 56px;
+}
+
+.partnersLead {
+  max-width: 68ch;
+  margin: -8px 0 24px;
+}
+
 .timeline {
   display: grid;
   grid-template-columns: minmax(140px, 0.3fr) 1fr;

@@ -1,0 +1,231 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-auto-rows: auto;
+  gap: 18px;
+}
+
+/* Обёртка появления: растягиваем на высоту строки, чтобы низ ряда был ровным */
+.wrap {
+  display: flex;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  padding: 22px;
+}
+
+.toolbar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+
+.card:hover .toolbar,
+.toolbar:focus-within {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .toolbar {
+    opacity: 1;
+  }
+}
+
+.action {
+  padding: 5px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--bg-soft);
+  font-size: 0.76rem;
+  color: var(--cream);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.action:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.actionDanger:hover {
+  border-color: #b8543f;
+  color: #e79a8a;
+}
+
+/*
+ * Логотипы обжарщиков нарисованы по-разному: у одного тёмные штрихи, у другого
+ * светлые. Держим их на ровной подложке, иначе на тёмной странице часть знаков
+ * просто пропадает.
+ */
+.logoBox {
+  display: grid;
+  place-items: center;
+  height: 108px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, rgba(245, 236, 225, 0.94), rgba(233, 223, 210, 0.88));
+}
+
+.logo {
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+/* Пустое место вместо логотипа: подсказка админу, что картинки нет */
+.logoEmpty {
+  font-size: 0.82rem;
+  color: #8a7a68;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+}
+
+.note {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+/* — Форма: карточка превращается в набор полей — */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  grid-column: span 2;
+  align-self: start;
+  padding: 22px 24px;
+}
+
+@media (max-width: 760px) {
+  .form {
+    grid-column: span 1;
+  }
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+/* Строка загрузки: кнопка и подпись с именем файла */
+.upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.fileInput {
+  display: none;
+}
+
+.preview {
+  display: grid;
+  place-items: center;
+  height: 96px;
+  padding: 12px 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, rgba(245, 236, 225, 0.94), rgba(233, 223, 210, 0.88));
+}
+
+.previewImage {
+  max-width: 100%;
+  max-height: 74px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #f4efe7;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.error {
+  padding: 10px 14px;
+  border: 1px solid rgba(184, 84, 63, 0.5);
+  border-radius: var(--radius-sm);
+  background: rgba(184, 84, 63, 0.12);
+  font-size: 0.88rem;
+  color: #f0c2b8;
+}
+
+/* Плитка добавления партнёра */
+.addCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 150px;
+  padding: 24px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+
+.addCard:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.addIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.addText {
+  font-size: 0.92rem;
+}
+
+.empty {
+  padding: 28px 4px;
+  color: var(--muted);
+}

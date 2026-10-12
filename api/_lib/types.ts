@@ -124,3 +124,36 @@ export const toDirection = (row: DirectionRow): Direction => ({
   text: row.text,
   points: row.points,
 })
+
+/** Партнёр: логотип и короткая подпись */
+export interface PartnerRow {
+  id: number
+  position: number
+  name: string
+  note: string
+  logo: string
+}
+
+export interface Partner {
+  id: number
+  name: string
+  note: string
+  /**
+   * Путь к файлу («/photos/partners/santino.png») или data URL, если логотип
+   * загрузили из админки.
+   */
+  logo: string
+}
+
+export const toPartner = (row: PartnerRow): Partner => ({
+  id: row.id,
+  name: row.name,
+  note: row.note,
+  logo: row.logo,
+})
+
+/**
+ * Предел размера логотипа. Картинка хранится в базе как data URL, поэтому
+ * ограничение нужно: иначе одна загрузка раздувает ответ API на мегабайты.
+ */
+export const MAX_LOGO_LENGTH = 700_000

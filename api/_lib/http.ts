@@ -8,8 +8,13 @@ import { query } from './db.js'
 import { sessionUserId } from './session.js'
 import { toPublicUser, type PublicUser, type UserRow } from './types.js'
 
-/** Тело запроса больше 100 КБ не читаем: формам сайта столько не нужно */
-const MAX_BODY = 100 * 1024
+/*
+ * Предел тела запроса. Формам сайта хватает и 100 КБ, но логотип партнёра
+ * приезжает как data URL и весит больше: картинка на 400 КБ превращается
+ * в строку около 550 КБ после base64. Ограничение на сам логотип отдельное —
+ * MAX_LOGO_LENGTH в types.ts.
+ */
+const MAX_BODY = 1024 * 1024
 
 export const sendJson = (res: ServerResponse, status: number, payload: unknown): void => {
   const body = JSON.stringify(payload)

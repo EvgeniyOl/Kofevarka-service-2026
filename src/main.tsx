@@ -19,11 +19,12 @@ if (!container) {
 void rootStore.auth.load()
 
 /*
- * Тексты блоков и карточки направлений грузим тоже заранее: страницы читают
- * их синхронно, иначе при первом кадре мелькали бы пустые места.
+ * Тексты блоков, карточки направлений и партнёров грузим заранее: страницы
+ * читают их синхронно, иначе при первом кадре мелькали бы пустые места.
  */
 void rootStore.content.load()
 void rootStore.directions.load()
+void rootStore.partners.load()
 
 createRoot(container).render(
   <StrictMode>

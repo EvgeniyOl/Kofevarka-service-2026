@@ -1,7 +1,8 @@
 # Источники изображений
 
 Файлы `machine-*.jpg` — свободные изображения с Wikimedia Commons;
-`mainPageCard1.webp` и фирменный знак — от владельца проекта.
+`mainPageCard1.webp`, логотипы в `partners/` и фирменный знак — материалы
+владельца проекта или его партнёров.
 Ссылка на страницу файла обязательна, если лицензия требует атрибуции.
 
 | Файл                     | Что на фото                                | Лицензия                       | Автор                   | Источник                                                                                                                |
@@ -10,6 +11,24 @@
 | `machine-modern.jpg`     | Профессиональная эспрессо-машина в кофейне | CC0 (public domain dedication) | Crew (Unsplash)         | [Modern coffee machine](<https://commons.wikimedia.org/wiki/File:Modern_coffee_machine_(Unsplash).jpg>)                 |
 | `machine-industrial.jpg` | Rancilio Classe 9 на барной стойке         | CC0 (public domain dedication) | Jordan Whitt (Unsplash) | [Industrial coffee machine](<https://commons.wikimedia.org/wiki/File:Industrial_coffee_machine_(Unsplash).jpg>)         |
 | `machine-grinding.jpg`   | Жерновые кофемолки с зерном                | CC0 (public domain dedication) | Crew (Unsplash)         | [Coffee machine grinding beans](<https://commons.wikimedia.org/wiki/File:Coffee_machine_grinding_beans_(Unsplash).jpg>) |
+
+## Логотипы партнёров
+
+Папка `partners/` — знаки обжарщиков, с которыми работает мастерская.
+Они показаны в блоке «С кем работаем» на странице «О нас».
+
+| Файл           | Партнёр         | Лицензия                                      |
+| -------------- | --------------- | --------------------------------------------- |
+| `santino.png`  | Santino         | знак партнёра, используется по договорённости |
+| `skuratov.png` | Skuratov Coffee | знак партнёра, используется по договорённости |
+| `surf.png`     | Surf Coffee     | знак партнёра, используется по договорённости |
+
+Логотипы с прозрачным фоном: чтобы тёмные знаки читались на тёмной странице,
+карточки показывают их на светлой подложке.
+
+Через админку можно загрузить новый логотип: картинка сжимается в браузере
+до 700 px по ширине и сохраняется в базе, файл на диск не пишется (на Vercel
+файловая система только для чтения).
 
 Первый экран главной раньше показывал рисованную сцену с гномом-кузнецом
 (`forge-dwarf.jpg`). Её заменили фотографией кофемашины: посетителю ближе

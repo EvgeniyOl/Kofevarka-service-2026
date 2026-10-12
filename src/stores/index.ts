@@ -5,6 +5,7 @@ import { ContentStore } from './ContentStore'
 import { DeliveryStore } from './DeliveryStore'
 import { DirectionsStore } from './DirectionsStore'
 import { HomeStore } from './HomeStore'
+import { PartnersStore } from './PartnersStore'
 import { RepairStore } from './RepairStore'
 import { SubscriptionStore } from './SubscriptionStore'
 
@@ -25,6 +26,8 @@ export class RootStore {
   readonly content: ContentStore
   /** Карточки направлений ремонта: их можно добавлять и удалять */
   readonly directions: DirectionsStore
+  /** Партнёры: логотипы и подписи на странице «О нас» */
+  readonly partners: PartnersStore
 
   constructor() {
     this.home = new HomeStore()
@@ -36,6 +39,7 @@ export class RootStore {
     this.auth = new AuthStore()
     this.content = new ContentStore()
     this.directions = new DirectionsStore()
+    this.partners = new PartnersStore()
   }
 }
 

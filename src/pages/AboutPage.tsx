@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router'
 import { ROUTES } from '../app/routes'
+import { PartnersBlock } from '../components/PartnersBlock'
 import { Reveal } from '../components/Reveal'
 import { SectionHeading } from '../components/SectionHeading'
 import { StatValue } from '../components/StatValue'
@@ -9,7 +10,7 @@ import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './AboutPage.module.css'
 
-/** О нас: история по годам, принципы и команда мастерской */
+/** О нас: история по годам, принципы, команда мастерской и партнёры */
 export const AboutPage = observer(function AboutPage() {
   const { about } = useStore()
 
@@ -94,6 +95,19 @@ export const AboutPage = observer(function AboutPage() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/*
+        Партнёры: логотипы обжарщиков с подписями. Админ добавляет, правит
+        и удаляет карточки прямо здесь — см. components/PartnersBlock.tsx
+      */}
+      <div className={styles.partnersBlock}>
+        <h3 className={styles.blockTitle}>С кем работаем</h3>
+        <p className={cx(ui.muted, styles.partnersLead)}>
+          Берём зерно у обжарщиков, в технике которых разбираемся: ставим его в аппараты после
+          настройки помола и следим, чтобы вкус не менялся от партии к партии.
+        </p>
+        <PartnersBlock />
       </div>
 
       <div className={cx(ui.card, styles.cta)}>

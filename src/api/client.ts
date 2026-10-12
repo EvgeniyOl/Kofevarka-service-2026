@@ -7,13 +7,14 @@
  */
 import type {
   Direction,
+  Partner,
   PublicUser,
   SiteContent,
   SiteRequest,
   RequestStatus,
 } from '../../api/_lib/types'
 
-export type { Direction, PublicUser, SiteContent, SiteRequest, RequestStatus }
+export type { Direction, Partner, PublicUser, SiteContent, SiteRequest, RequestStatus }
 
 /** Ошибка с текстом от сервера: показываем её прямо в форме */
 export class ApiError extends Error {
@@ -132,6 +133,27 @@ export const api = {
 
   removeDirection: (id: number) =>
     request<{ ok: true }>('/directions', {
+      method: 'DELETE',
+      body: JSON.stringify({ id }),
+    }),
+
+  /** Партнёры: читают все, меняет только админ */
+  partners: () => request<{ partners: Partner[] }>('/partners'),
+
+  addPartner: (data: { name: string; note: string; logo: string }) =>
+    request<{ partner: Partner }>('/partners', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updatePartner: (data: { id: number; name: string; note: string; logo: string }) =>
+    request<{ partner: Partner }>('/partners', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  removePartner: (id: number) =>
+    request<{ ok: true }>('/partners', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
     }),
