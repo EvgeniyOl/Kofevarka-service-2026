@@ -66,8 +66,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     await clearAttempts(req, email)
 
     const user = toPublicUser(rows[0])
-    setSessionCookie(res, createSessionToken(user.id))
-    sendJson(res, 201, { user })
+    const token = createSessionToken(user.id)
+    // Токен отдаём и в cookie (веб), и в теле ответа (мобильное приложение)
+    setSessionCookie(res, token)
+    sendJson(res, 201, { user, token })
   } catch (error) {
     handleError(res, error)
   }

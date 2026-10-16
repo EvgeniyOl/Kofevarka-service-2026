@@ -27,23 +27,118 @@ export interface PublicUser {
 
 export type RequestStatus = 'new' | 'in_progress' | 'done'
 
+/**
+ * Статусы ремонта для личного кабинета клиента. Значения должны совпадать
+ * с REPAIR_STATUSES в packages/shared проекта KofevarkaMob: приложение
+ * показывает подписи по этим ключам.
+ */
+export const REPAIR_STATUSES = [
+  'new',
+  'accepted',
+  'diagnostics',
+  'approval',
+  'waiting_parts',
+  'repair',
+  'ready',
+  'issued',
+  'declined',
+  'canceled',
+] as const
+
+export type RepairStatus = (typeof REPAIR_STATUSES)[number]
+
+/** Статус заявки: старые значения тоже встречаются — их проставили до кабинета */
+export type AnyRequestStatus = RequestStatus | RepairStatus
+
+export const isRepairStatus = (value: unknown): value is RepairStatus =>
+  typeof value === 'string' && (REPAIR_STATUSES as readonly string[]).includes(value)
+
+/** Виды техники: те же ключи, что в приложении */
+export const DEVICE_KINDS = [
+  'coffee_machine',
+  'professional',
+  'grinder',
+  'coffee_maker',
+  'kettle',
+  'other',
+] as const
+
+export type DeviceKind = (typeof DEVICE_KINDS)[number]
+
+export const isDeviceKind = (value: unknown): value is DeviceKind =>
+  typeof value === 'string' && (DEVICE_KINDS as readonly string[]).includes(value)
+
+/** Что нужно клиенту: ремонт, диагностика, обслуживание, вывоз техники */
+export const REQUEST_KINDS = [
+  'diagnostics',
+  'repair',
+  'maintenance',
+  'pickup',
+  'consultation',
+] as const
+
+export type RequestKind = (typeof REQUEST_KINDS)[number]
+
+export const isRequestKind = (value: unknown): value is RequestKind =>
+  typeof value === 'string' && (REQUEST_KINDS as readonly string[]).includes(value)
+
 export interface SiteRequestRow {
   id: number
   user_id: number | null
   name: string
   email: string
   message: string
-  status: RequestStatus
+  status: AnyRequestStatus
+  kind: RequestKind
+  device_kind: DeviceKind
+  device_model: string
+  serial: string | null
+  phone: string | null
+  master_comment: string | null
+  price: number | null
+  warranty_days: number | null
   created_at: string
+  updated_at: string
 }
 
 export interface SiteRequest {
   id: number
+  userId: number | null
   name: string
   email: string
   message: string
-  status: RequestStatus
+  status: AnyRequestStatus
+  kind: RequestKind
+  deviceKind: DeviceKind
+  deviceModel: string
+  serial: string | null
+  phone: string | null
+  masterComment: string | null
+  price: number | null
+  warrantyDays: number | null
   createdAt: string
+  updatedAt: string
+}
+
+/** Событие истории ремонта: точка на таймлайне в приложении */
+export interface RequestEventRow {
+  id: number
+  request_id: number
+  status: string
+  comment: string
+  created_at: string
+}
+
+export interface RequestEvent {
+  id: number
+  status: AnyRequestStatus
+  comment: string
+  createdAt: string
+}
+
+/** Ремонт в личном кабинете: заявка вместе с историей статусов */
+export interface RepairOrder extends SiteRequest {
+  events: RequestEvent[]
 }
 
 export const toPublicUser = (row: UserRow): PublicUser => ({
@@ -56,11 +151,33 @@ export const toPublicUser = (row: UserRow): PublicUser => ({
 
 export const toSiteRequest = (row: SiteRequestRow): SiteRequest => ({
   id: row.id,
+  userId: row.user_id,
   name: row.name,
   email: row.email,
   message: row.message,
   status: row.status,
+  kind: row.kind,
+  deviceKind: row.device_kind,
+  deviceModel: row.device_model,
+  serial: row.serial,
+  phone: row.phone,
+  masterComment: row.master_comment,
+  price: row.price,
+  warrantyDays: row.warranty_days,
   createdAt: row.created_at,
+  updatedAt: row.updated_at,
+})
+
+export const toRequestEvent = (row: RequestEventRow): RequestEvent => ({
+  id: row.id,
+  status: row.status as AnyRequestStatus,
+  comment: row.comment,
+  createdAt: row.created_at,
+})
+
+export const toRepairOrder = (row: SiteRequestRow, events: RequestEventRow[]): RepairOrder => ({
+  ...toSiteRequest(row),
+  events: events.map(toRequestEvent),
 })
 
 /**

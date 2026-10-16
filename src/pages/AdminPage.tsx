@@ -6,12 +6,27 @@ import { cx } from '../utils/cx'
 import ui from '../styles/ui.module.css'
 import styles from './AdminPage.module.css'
 
-/** Что значит каждый статус заявки — подписи для списка */
-const STATUS_LABELS = {
+/**
+ * Что значит каждый статус заявки — подписи для списка.
+ * Кроме статусов сайта здесь статусы ремонта из мобильного приложения
+ * (KofevarkaMob): мастер видит в админке те же формулировки, что клиент
+ * в приложении. Запись Partial, потому что база может отдать статус,
+ * которого фронтенд ещё не знает, — тогда показываем его как есть.
+ */
+const STATUS_LABELS: Record<string, string> = {
   new: 'Новая',
   in_progress: 'В работе',
   done: 'Закрыта',
-} as const
+  accepted: 'Принято в работу',
+  diagnostics: 'Диагностика',
+  approval: 'Ждём согласия клиента',
+  waiting_parts: 'Ждём запчасти',
+  repair: 'Ремонт',
+  ready: 'Готово к выдаче',
+  issued: 'Выдано',
+  declined: 'Отказ от ремонта',
+  canceled: 'Заявка отменена',
+}
 
 const formatDate = (value: string): string =>
   new Intl.DateTimeFormat('ru-RU', { dateStyle: 'short', timeStyle: 'short' }).format(
@@ -94,7 +109,7 @@ export const AdminPage = observer(function AdminPage() {
               </span>
               <span className={styles.muted}>{item.message}</span>
               <span>
-                <span className={styles.status}>{STATUS_LABELS[item.status]}</span>
+                <span className={styles.status}>{STATUS_LABELS[item.status] ?? item.status}</span>
               </span>
             </div>
           ))}

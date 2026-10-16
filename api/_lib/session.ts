@@ -94,8 +94,27 @@ export const clearSessionCookie = (res: ServerResponse): void => {
   res.setHeader('Set-Cookie', `${COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`)
 }
 
+/**
+ * Токен из заголовка «Authorization: Bearer <токен>».
+ * Нужен мобильному приложению: у нативного клиента нет надёжного хранилища
+ * cookie, зато есть keychain/keystore, куда кладут именно токен.
+ */
+export const readBearerToken = (req: IncomingMessage): string | undefined => {
+  const header = req.headers.authorization
+  if (!header) return undefined
+
+  const [scheme, value] = header.split(' ')
+  if (!value || scheme.toLowerCase() !== 'bearer') return undefined
+  return value.trim() || undefined
+}
+
+/**
+ * Кто выполняет запрос: сначала заголовок Authorization, потом cookie.
+ * Веб-клиент ходит с cookie, мобильный — с Bearer-токеном; обе схемы
+ * проверяются одной и той же подписью, поэтому второй ветки логики не нужно.
+ */
 export const sessionUserId = (req: IncomingMessage): number | null =>
-  readSessionToken(readCookies(req)[COOKIE_NAME])
+  readSessionToken(readBearerToken(req) ?? readCookies(req)[COOKIE_NAME])
 
 /** Проверка роли: используется в админских ручках */
 export const isAdmin = (role: Role | undefined): boolean => role === 'admin'

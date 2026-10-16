@@ -37,6 +37,66 @@ CREATE TABLE IF NOT EXISTS site_requests (
 CREATE INDEX IF NOT EXISTS site_requests_created_at_idx ON site_requests (created_at DESC);
 
 /*
+ * Личный кабинет клиента (мобильное приложение). Заявка с сайта и заявка на
+ * ремонт — одна сущность: мастер ведёт их в одном списке, а не в двух.
+ * Колонки добавляем отдельными ALTER: таблица уже существует в проде,
+ * и CREATE TABLE её не тронет.
+ *
+ * created_at у заявки — момент приёма, updated_at — последнее изменение
+ * (по нему сортируется список «мои ремонты»).
+ */
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'repair';
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS device_kind TEXT NOT NULL DEFAULT 'coffee_machine';
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS device_model TEXT NOT NULL DEFAULT '';
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS serial TEXT;
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS master_comment TEXT;
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS price INTEGER;
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS warranty_days INTEGER;
+ALTER TABLE site_requests ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+
+/*
+ * Статусы ремонта. Старые значения (in_progress, done) оставляем в CHECK:
+ * их проставили заявкам до появления кабинета, и запрет сломал бы чтение
+ * существующих строк. Значения должны совпадать с REPAIR_STATUSES
+ * в packages/shared проекта KofevarkaMob.
+ */
+ALTER TABLE site_requests DROP CONSTRAINT IF EXISTS site_requests_status_check;
+ALTER TABLE site_requests ADD CONSTRAINT site_requests_status_check
+  CHECK (status IN (
+    'new', 'in_progress', 'done',
+    'accepted', 'diagnostics', 'approval', 'waiting_parts',
+    'repair', 'ready', 'issued', 'declined', 'canceled'
+  ));
+
+CREATE INDEX IF NOT EXISTS site_requests_user_idx ON site_requests (user_id, updated_at DESC);
+
+/*
+ * История ремонта: что и когда менялось. Без неё клиент видит только текущий
+ * статус, а вопрос «когда это случилось» остаётся без ответа.
+ */
+CREATE TABLE IF NOT EXISTS request_events (
+  id         SERIAL PRIMARY KEY,
+  request_id INTEGER NOT NULL REFERENCES site_requests(id) ON DELETE CASCADE,
+  status     TEXT NOT NULL,
+  comment    TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS request_events_request_idx ON request_events (request_id, created_at DESC);
+
+/*
+ * Первое событие для заявок, которые уже были в базе: иначе у ремонта
+ * с историей пусто, и таймлайн в приложении начинается с середины.
+ * Повторный запуск миграции ничего не добавит — проверяем наличие событий.
+ */
+INSERT INTO request_events (request_id, status, comment, created_at)
+SELECT r.id, r.status, 'Заявка принята', r.created_at
+FROM site_requests r
+WHERE r.user_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM request_events e WHERE e.request_id = r.id);
+
+/*
  * Редактируемые тексты сайта. В таблице лежат только те блоки, которые админ
  * менял: если строки нет, страница показывает текст из кода. Так правка одного
  * заголовка не требует заводить записи для всего сайта.
@@ -235,6 +295,38 @@ WHERE NOT EXISTS (SELECT 1 FROM site_meta WHERE key = $1);
 export const databaseUrl = (): string | undefined =>
   process.env.DATABASE_URL ?? process.env.POSTGRES_URL
 
+/**
+ * Neon на serverless подключают через пулер.
+ *
+ * Прямое подключение держит отдельный процесс базы на каждое соединение,
+ * а функций Vercel несколько, и каждая открывает своё. У Neon на это жёсткий
+ * лимит: когда он исчерпан, новые подключения не отказывают сразу, а висят —
+ * API просто перестаёт отвечать. Пулер держит соединения с базой сам и
+ * раздаёт их функциям, поэтому хост у него со словом `-pooler`.
+ *
+ * Если адрес не от Neon или пулер уже указан, ничего не меняем.
+ */
+export const withPooler = (url: string): string => {
+  if (url.includes('-pooler')) return url
+
+  try {
+    const parsed = new URL(url)
+    if (!parsed.hostname.endsWith('.neon.tech')) return url
+
+    /*
+     * У Neon пулер отличается словом в имени эндпоинта, а не в конце хоста:
+     * прямой адрес — ep-cool-1.us-east-2.aws.neon.tech,
+     * через пулер — ep-cool-1-pooler.us-east-2.aws.neon.tech.
+     */
+    const [endpoint, ...rest] = parsed.hostname.split('.')
+    parsed.hostname = [`${endpoint}-pooler`, ...rest].join('.')
+    return parsed.toString()
+  } catch {
+    // Адрес нестандартный — оставляем как есть, подключение разберётся само
+    return url
+  }
+}
+
 export const getPool = (): Pool => {
   const url = databaseUrl()
 
@@ -245,11 +337,13 @@ export const getPool = (): Pool => {
   }
 
   if (!globalThis.__kofevarkaPool) {
+    const connection = withPooler(url)
+
     globalThis.__kofevarkaPool = new Pool({
-      connectionString: url,
+      connectionString: connection,
       // Neon и большинство облачных Postgres требуют TLS, но с самоподписанным
       // сертификатом в цепочке — поэтому rejectUnauthorized: false
-      ssl: url.includes('localhost') ? undefined : { rejectUnauthorized: false },
+      ssl: connection.includes('localhost') ? undefined : { rejectUnauthorized: false },
       /*
        * Каждая функция Vercel — отдельный процесс со своим пулом, поэтому
        * держим по одному соединению: иначе десяток параллельных запросов
@@ -275,11 +369,22 @@ export const getPool = (): Pool => {
  * блокирующий: на Vercel функции выполняются в нескольких экземплярах сразу,
  * и если один из них не успеет отпустить блокировку (таймаут функции,
  * замороженное соединение в пуле), все остальные повиснут навсегда —
- * ровно это и случилось однажды с продом. Идемпотентность важнее: повторный
- * прогон миграции ничего не портит, а зависший API не лечится ничем.
+ * ровно это и случилось однажды с продом.
+ *
+ * Ещё важнее `lock_timeout`: DDL берёт исключительную блокировку таблицы,
+ * а её может держать чужая зависшая транзакция. Без таймаута миграция ждёт
+ * её бесконечно, и вместе с ней виснет каждый запрос к API — тоже из практики.
+ * Если за три секунды таблицы не освободились, миграцию пропускаем: схема
+ * уже создана раньше, а работать сайту важнее, чем досоздать таблицу.
  */
 const ensureSchema = async (): Promise<void> => {
-  await getPool().query(SCHEMA_SQL)
+  try {
+    await getPool().query(`SET lock_timeout = '3000ms'; ${SCHEMA_SQL}`)
+  } catch (error) {
+    // Свежая база такую ошибку не даст: там таблицы свободны. Значит,
+    // дело в чужой блокировке — сообщаем в лог и продолжаем работу
+    console.error('Миграция схемы не выполнена:', error)
+  }
 }
 
 export const ready = (): Promise<void> => {

@@ -58,8 +58,11 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     await clearAttempts(req, email)
 
     const user = toPublicUser(row)
-    setSessionCookie(res, createSessionToken(user.id))
-    sendJson(res, 200, { user })
+    const token = createSessionToken(user.id)
+    // Веб-клиент берёт сессию из cookie, мобильное приложение — из тела ответа:
+    // у нативного клиента нет надёжного хранилища cookie, зато есть keychain
+    setSessionCookie(res, token)
+    sendJson(res, 200, { user, token })
   } catch (error) {
     handleError(res, error)
   }

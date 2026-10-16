@@ -7,7 +7,7 @@
  * Обработчики пишутся под обычные Node-объекты запроса и ответа, поэтому
  * один и тот же код работает и здесь, и на Vercel.
  */
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync } from 'node:fs'
 import { join, resolve, sep } from 'node:path'
 import type { Connect, Plugin, ViteDevServer } from 'vite'
 
@@ -32,6 +32,10 @@ const normalizePathname = (rawUrl: string): string | null => {
 /**
  * Находит файл ручки. Путь из запроса может содержать «../», поэтому
  * результат обязательно проверяем: он должен остаться внутри папки api.
+ *
+ * Динамические сегменты ищем так же, как это делает Vercel: запрос
+ * «/api/me/repairs/42» обслуживает файл «api/me/repairs/[id].ts». Без этого
+ * ручки с параметром пути работали бы только в продакшене.
  */
 const resolveHandler = (apiDir: string, pathname: string): string | null => {
   const relative = pathname.replace(/^\/api\/?/, '').replace(/\/+$/, '')
@@ -46,6 +50,15 @@ const resolveHandler = (apiDir: string, pathname: string): string | null => {
   for (const indexFile of INDEX_FILES) {
     const candidate = join(base, indexFile)
     if (existsSync(candidate)) return candidate
+  }
+
+  // Последний сегмент пути может быть параметром: api/me/repairs/[id].ts
+  const parent = resolve(base, '..')
+  if (parent === apiDir || parent.startsWith(apiDir + sep)) {
+    const dynamic = readdirSync(parent).find(
+      (entry) => entry.startsWith('[') && entry.endsWith('].ts'),
+    )
+    if (dynamic) return join(parent, dynamic)
   }
 
   return null
