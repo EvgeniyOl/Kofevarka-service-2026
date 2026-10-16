@@ -107,6 +107,12 @@ export interface SiteRequest {
   name: string
   email: string
   message: string
+  /**
+   * Описание проблемы теми же словами, что в message. Колонка в базе одна
+   * (message — историческое имя для формы сайта), но мобильному приложению
+   * нужно поле problem: он показывает его клиенту как «что случилось».
+   */
+  problem: string
   status: AnyRequestStatus
   kind: RequestKind
   deviceKind: DeviceKind
@@ -155,6 +161,7 @@ export const toSiteRequest = (row: SiteRequestRow): SiteRequest => ({
   name: row.name,
   email: row.email,
   message: row.message,
+  problem: row.message,
   status: row.status,
   kind: row.kind,
   deviceKind: row.device_kind,

@@ -9,14 +9,12 @@ import { query } from './db.js'
 import { HttpError } from './http.js'
 import {
   toRepairOrder,
-  toSiteRequest,
   type AnyRequestStatus,
   type DeviceKind,
   type RepairOrder,
   type RepairStatus,
   type RequestEventRow,
   type RequestKind,
-  type SiteRequest,
   type SiteRequestRow,
 } from './types.js'
 
@@ -57,9 +55,44 @@ const listForUser = async (userId: number, scope: RepairScope): Promise<SiteRequ
   )
 }
 
-/** Ремонты клиента без истории: список в приложении историю не показывает */
-export const repairsForUser = async (userId: number, scope: RepairScope): Promise<SiteRequest[]> =>
-  (await listForUser(userId, scope)).map(toSiteRequest)
+/**
+ * История сразу для нескольких заявок — одним запросом.
+ * Отдельный запрос на каждую заявку дал бы десяток обращений к базе ради
+ * одного экрана: у serverless-функции каждое лишнее обращение заметно.
+ */
+const eventsForOrders = async (ids: number[]): Promise<Map<number, RequestEventRow[]>> => {
+  const grouped = new Map<number, RequestEventRow[]>()
+  if (ids.length === 0) return grouped
+
+  const rows = await query<RequestEventRow>(
+    `SELECT * FROM request_events
+     WHERE request_id = ANY($1::int[])
+     ORDER BY created_at DESC, id DESC`,
+    [ids],
+  )
+
+  for (const row of rows) {
+    const list = grouped.get(row.request_id)
+    if (list) list.push(row)
+    else grouped.set(row.request_id, [row])
+  }
+
+  return grouped
+}
+
+/**
+ * Ремонты клиента вместе с историей статусов. История нужна не только
+ * в карточке: вкладка «События» собирает ленту по всем ремонтам сразу.
+ */
+export const repairsForUser = async (
+  userId: number,
+  scope: RepairScope,
+): Promise<RepairOrder[]> => {
+  const rows = await listForUser(userId, scope)
+  const events = await eventsForOrders(rows.map((row) => row.id))
+
+  return rows.map((row) => toRepairOrder(row, events.get(row.id) ?? []))
+}
 
 /**
  * Один ремонт вместе с историей статусов.
